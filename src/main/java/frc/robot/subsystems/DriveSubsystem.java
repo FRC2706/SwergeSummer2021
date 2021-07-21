@@ -17,6 +17,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
     // Robot swerve modules
+
+    private final SwerveModule m_frontLeft = new SwerveModule(0,1);
+    private final SwerveModule m_rearLeft = new SwerveModule(2,3);
+    private final SwerveModule m_frontRight = new SwerveModule(4,5);
+    private final SwerveModule m_rearRight = new SwerveModule(6,7);
+
+    /*
     private final SwerveModule m_frontLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort,
             DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveEncoderPorts,
             DriveConstants.kFrontLeftTurningEncoderPorts, DriveConstants.kFrontLeftDriveEncoderReversed,
@@ -37,6 +44,7 @@ public class DriveSubsystem extends SubsystemBase {
             DriveConstants.kRearRightTurningEncoderPorts, DriveConstants.kRearRightDriveEncoderReversed,
             DriveConstants.kRearRightTurningEncoderReversed);
 
+            */
     // The gyro sensor
     private final Gyro m_gyro = new ADXRS450_Gyro();
 

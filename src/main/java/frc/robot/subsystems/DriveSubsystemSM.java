@@ -13,29 +13,13 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.SwerveModule;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystemSM extends SubsystemBase {
     // Robot swerve modules
-    private final SwerveModule m_frontLeft = new SwerveModule(DriveConstants.kFrontLeftDriveMotorPort,
-            DriveConstants.kFrontLeftTurningMotorPort, DriveConstants.kFrontLeftDriveEncoderPorts,
-            DriveConstants.kFrontLeftTurningEncoderPorts, DriveConstants.kFrontLeftDriveEncoderReversed,
-            DriveConstants.kFrontLeftTurningEncoderReversed);
-
-    private final SwerveModule m_rearLeft = new SwerveModule(DriveConstants.kRearLeftDriveMotorPort,
-            DriveConstants.kRearLeftTurningMotorPort, DriveConstants.kRearLeftDriveEncoderPorts,
-            DriveConstants.kRearLeftTurningEncoderPorts, DriveConstants.kRearLeftDriveEncoderReversed,
-            DriveConstants.kRearLeftTurningEncoderReversed);
-
-    private final SwerveModule m_frontRight = new SwerveModule(DriveConstants.kFrontRightDriveMotorPort,
-            DriveConstants.kFrontRightTurningMotorPort, DriveConstants.kFrontRightDriveEncoderPorts,
-            DriveConstants.kFrontRightTurningEncoderPorts, DriveConstants.kFrontRightDriveEncoderReversed,
-            DriveConstants.kFrontRightTurningEncoderReversed);
-
-    private final SwerveModule m_rearRight = new SwerveModule(DriveConstants.kRearRightDriveMotorPort,
-            DriveConstants.kRearRightTurningMotorPort, DriveConstants.kRearRightDriveEncoderPorts,
-            DriveConstants.kRearRightTurningEncoderPorts, DriveConstants.kRearRightDriveEncoderReversed,
-            DriveConstants.kRearRightTurningEncoderReversed);
+    private final SwerveModule m_singleModule = new SwerveModule(0,1);
 
     // The gyro sensor
     private final Gyro m_gyro = new ADXRS450_Gyro();
@@ -50,8 +34,7 @@ public class DriveSubsystemSM extends SubsystemBase {
     @Override
     public void periodic() {
         // Update the odometry in the periodic block
-        m_odometry.update(m_gyro.getRotation2d(), m_frontLeft.getState(), m_rearLeft.getState(),
-                m_frontRight.getState(), m_rearRight.getState());
+        m_odometry.update(m_gyro.getRotation2d(), m_singleModule.getState());
     }
 
     /**
@@ -83,14 +66,26 @@ public class DriveSubsystemSM extends SubsystemBase {
      */
     @SuppressWarnings("ParameterName")
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-                        : new ChassisSpeeds(xSpeed, ySpeed, rot));
-        SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-        m_frontLeft.setDesiredState(swerveModuleStates[0]);
-        m_frontRight.setDesiredState(swerveModuleStates[1]);
-        m_rearLeft.setDesiredState(swerveModuleStates[2]);
-        m_rearRight.setDesiredState(swerveModuleStates[3]);
+        // var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+        //         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+        //                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
+        // SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        // m_frontLeft.setDesiredState(swerveModuleStates[0]);
+        // m_frontRight.setDesiredState(swerveModuleStates[1]);
+        // m_rearLeft.setDesiredState(swerveModuleStates[2]);
+        // m_rearRight.setDesiredState(swerveModuleStates[3]);
+
+
+
+        //for the single module: chassis speed = single module state
+        ChassisSpeeds chassisSpeed = fieldRelative ? 
+                                     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                                     : new ChassisSpeeds(xSpeed, ySpeed, rot);
+
+        //convert the chassisSpeed to the module state
+        SwerveModuleState desiredState = new SwerveModuleState(Math.sqrt(xSpeed*xSpeed+ySpeed*ySpeed), new Rotation2d(Math.atan(ySpeed/xSpeed) + rot));
+        m_singleModule.setDesiredState(desiredState);
+
     }
 
     /**
@@ -99,19 +94,15 @@ public class DriveSubsystemSM extends SubsystemBase {
      * @param desiredStates The desired SwerveModule states.
      */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-        m_frontLeft.setDesiredState(desiredStates[0]);
-        m_frontRight.setDesiredState(desiredStates[1]);
-        m_rearLeft.setDesiredState(desiredStates[2]);
-        m_rearRight.setDesiredState(desiredStates[3]);
+        //SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
+        m_singleModule.setDesiredState(desiredStates[0]);
+        
     }
 
     /** Resets the drive encoders to currently read a position of 0. */
     public void resetEncoders() {
-        m_frontLeft.resetEncoders();
-        m_rearLeft.resetEncoders();
-        m_frontRight.resetEncoders();
-        m_rearRight.resetEncoders();
+        m_singleModule.resetEncoders();
+    
     }
 
     /** Zeroes the heading of the robot. */

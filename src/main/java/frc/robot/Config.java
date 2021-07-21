@@ -77,6 +77,7 @@ public final class Config {
     public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
     public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
 
+    //CANEncoder 4096???
     public static final int kEncoderCPR = 1024;
     public static final double kWheelDiameterMeters = 0.15;
     public static final double kDriveEncoderDistancePerPulse =

@@ -5,6 +5,11 @@
 package frc.robot.subsystems;
 
 import com.revrobotics.CANPIDController;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.ControlType;
+
 
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.Spark;
@@ -16,13 +21,13 @@ import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 public class SwerveModule {
-    private final Spark m_driveMotor;
-    private final Spark m_turningMotor;
 
-    private final Encoder m_driveEncoder;
-    private final Encoder m_turningEncoder;
+    private CANSparkMax m_driveMotor;
+    private CANPIDController m_drivePIDController;
+    private CANEncoder m_driveEncoder;
 
-    private final PIDController m_drivePIDController = new PIDController(ModuleConstants.kPModuleDriveController, 0, 0);
+    private CANSparkMax m_turningMotor;
+    private CANEncoder m_turningEncoder;
 
     // Using a TrapezoidProfile PIDController to allow for smooth turning
     private final ProfiledPIDController m_turningPIDController = new ProfiledPIDController(
@@ -36,16 +41,9 @@ public class SwerveModule {
      * @param driveMotorChannel   ID for the drive motor.
      * @param turningMotorChannel ID for the turning motor.
      */
-    public SwerveModule(int driveMotorChannel, int turningMotorChannel, int[] driveEncoderPorts,
-            int[] turningEncoderPorts, boolean driveEncoderReversed, boolean turningEncoderReversed) {
+    public SwerveModule(int driveMotorChannel, int turningMotorChannel) {
 
-        m_driveMotor = new Spark(driveMotorChannel);
-        m_turningMotor = new Spark(turningMotorChannel);
-
-        this.m_driveEncoder = new Encoder(driveEncoderPorts[0], driveEncoderPorts[1]);
-
-        this.m_turningEncoder = new Encoder(turningEncoderPorts[0], turningEncoderPorts[1]);
-
+        /*
         // Set the distance per pulse for the drive encoder. We can simply use the
         // distance traveled for one rotation of the wheel divided by the encoder
         // resolution.
@@ -61,10 +59,42 @@ public class SwerveModule {
 
         // Set whether turning encoder should be reversed or not
         m_turningEncoder.setReverseDirection(turningEncoderReversed);
+              
+        */
+
+        //=======================
+
+        //driver motor controller
+        m_driveMotor = new CANSparkMax(driveMotorChannel, MotorType.kBrushless);
+
+        // Factory Default to prevent unexpected behaviour
+        m_driveMotor.restoreFactoryDefaults();
+
+        //???
+        m_driveMotor.setInverted(true);
+
+        m_drivePIDController = m_driveMotor.getPIDController();
+        m_drivePIDController.setOutputRange(-1, 1);
+        m_drivePIDController.setFF(1.0);
+        m_drivePIDController.setP(1.0);
+        m_drivePIDController.setI(0);
+        m_drivePIDController.setD(0);
+
+        m_driveEncoder = m_driveMotor.getEncoder();
+
+        //tuning motor controller
+        m_turningMotor = new CANSparkMax(turningMotorChannel, MotorType.kBrushless);
+        m_turningMotor.restoreFactoryDefaults();
+        //????
+        m_turningMotor.setInverted(true);
 
         // Limit the PID Controller's input range between -pi and pi and set the input
         // to be continuous.
         m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI);
+        m_turningPIDController.reset(0.0);
+
+        m_turningEncoder = m_turningMotor.getEncoder();
+          
     }
 
     /**
@@ -73,7 +103,10 @@ public class SwerveModule {
      * @return The current state of the module.
      */
     public SwerveModuleState getState() {
-        return new SwerveModuleState(m_driveEncoder.getRate(), new Rotation2d(m_turningEncoder.get()));
+        //m_driveEncoder.getVelocity();  //--> unit RPM --> m/s
+        //m_turningEncoder.getPosition(); //native units of rotation
+        return new SwerveModuleState(m_driveEncoder.getVelocity() * ModuleConstants.kDriveEncoderDistancePerPulse/60.,
+                                     new Rotation2d(m_turningEncoder.getPosition() * ModuleConstants.kTurningEncoderDistancePerPulse));
     }
 
     /**
@@ -83,22 +116,28 @@ public class SwerveModule {
      */
     public void setDesiredState(SwerveModuleState desiredState) {
         // Optimize the reference state to avoid spinning further than 90 degrees
-        SwerveModuleState state = SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.get()));
+        SwerveModuleState state = SwerveModuleState.optimize(desiredState, 
+                                  new Rotation2d(m_turningEncoder.getPosition() * ModuleConstants.kTurningEncoderDistancePerPulse));
 
-        // Calculate the drive output from the drive PID controller.
-        final double driveOutput = m_drivePIDController.calculate(m_driveEncoder.getRate(), state.speedMetersPerSecond);
+
+        //m_driveMotor.set(0.0);
+        m_drivePIDController.setReference(state.speedMetersPerSecond/ModuleConstants.kDriveEncoderDistancePerPulse * 60., 
+                                          ControlType.kVelocity);
+
 
         // Calculate the turning motor output from the turning PID controller.
-        final var turnOutput = m_turningPIDController.calculate(m_turningEncoder.get(), state.angle.getRadians());
+        final var turnOutput = m_turningPIDController.calculate(m_turningEncoder.getPosition() * ModuleConstants.kTurningEncoderDistancePerPulse, 
+                               state.angle.getRadians());
 
         // Calculate the turning motor output from the turning PID controller.
-        m_driveMotor.set(driveOutput);
-        m_turningMotor.set(turnOutput);
+        m_turningMotor.set(turnOutput);       
+       
+        //m_turningPIDController.setReference(state.angle.getRadians(), ControlType.kPosition);
     }
 
     /** Zeros all the SwerveModule encoders. */
     public void resetEncoders() {
-        m_driveEncoder.reset();
-        m_turningEncoder.reset();
+        m_driveEncoder.setPosition(0);
+        m_turningEncoder.setPosition(0);
     }
 }
