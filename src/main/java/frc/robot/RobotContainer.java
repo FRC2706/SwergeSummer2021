@@ -23,6 +23,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import frc.robot.comamands.SingleModuleOnce;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -62,7 +63,17 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+      Joystick joyStick1 = new Joystick(1);
+
+      //Instantiate the command and bind it
+      Command singleModuleOnce0 = new SingleModuleOnce();
+      new JoystickButton(joyStick1, XboxController.Button.kBumberLeft.value).whenHeld(singleModuleOnce0);
+
+      Command singleModuleOnce1 = new SingleModuleOnce();  
+      new JoystickButton(joystick1, XboxController.Button.KBumberRight.value).whenHeld(singleModuleOnce1);
+  }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
