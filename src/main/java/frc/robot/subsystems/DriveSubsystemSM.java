@@ -16,16 +16,18 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.SwerveModule;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
+import frc.robot.Config;
+
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystemSM extends SubsystemBase {
     // Robot swerve modules
-    private final SwerveModule m_singleModule = new SwerveModule(0,1);
+    private final SwerveModule m_singleModule = new SwerveModule(0);
 
     // The gyro sensor
     private final Gyro m_gyro = new ADXRS450_Gyro();
 
     // Odometry class for tracking robot pose
-    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, m_gyro.getRotation2d());
+    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Config.kDriveKinematics, m_gyro.getRotation2d());
 
     /** Creates a new DriveSubsystem. */
     public DriveSubsystemSM() {
@@ -125,6 +127,6 @@ public class DriveSubsystemSM extends SubsystemBase {
      * @return The turn rate of the robot, in degrees per second
      */
     public double getTurnRate() {
-        return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+        return m_gyro.getRate() * (Config.kGyroReversed ? -1.0 : 1.0);
     }
 }
