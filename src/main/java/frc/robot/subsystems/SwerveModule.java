@@ -11,19 +11,19 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
 import frc.robot.Config;
-import frc.robot.Config.ModuleConstants;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class SwerveModule extends SubsystemBase {
 
@@ -47,6 +47,15 @@ public class SwerveModule extends SubsystemBase {
     private int m_turningEncoderCPR;
 
     private double m_turningEncoderAccumPos;
+
+    private NetworkTable      swerveModuleTable;
+    private NetworkTableEntry desiredSpeedEntry ;
+    private NetworkTableEntry desiredAngleEntry;
+    private NetworkTableEntry currentSpeedEntry;
+    private NetworkTableEntry currentAngleEntry;
+    private NetworkTableEntry speedError;
+    private NetworkTableEntry angleError;
+
     /**
      * Constructs a SwerveModule.
      *
@@ -57,29 +66,7 @@ public class SwerveModule extends SubsystemBase {
      *        3 - rearRight
      */
     public SwerveModule( int moduleIndex ) {
-
-        /*
-        // Set the distance per pulse for the drive encoder. We can simply use the
-        // distance traveled for one rotation of the wheel divided by the encoder
-        // resolution.
-        m_driveEncoder.setDistancePerPulse(ModuleConstants.kDriveEncoderDistancePerPulse);
-
-        // Set whether drive encoder should be reversed or not
-        m_driveEncoder.setReverseDirection(driveEncoderReversed);
-
-        // Set the distance (in this case, angle) per pulse for the turning encoder.
-        // This is the the angle through an entire rotation (2 * wpi::math::pi)
-        // divided by the encoder resolution.
-        m_turningEncoder.setDistancePerPulse(ModuleConstants.kTurningEncoderDistancePerPulse);
-
-        // Set whether turning encoder should be reversed or not
-        m_turningEncoder.setReverseDirection(turningEncoderReversed);
-              
-        */
-
-        
-        //=======================
-
+        //module index
         m_moduleIndex = moduleIndex;
 
         //driver motor controller
@@ -102,7 +89,7 @@ public class SwerveModule extends SubsystemBase {
         m_driveEncoderCPR = m_driveEncoder.getCountsPerRevolution();
         m_driveEncoder.setVelocityConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kVelocityConversionFactor);
 
-        //tuning motor controller
+        //turning motor controller
         m_turningMotor = new CANSparkMax(Config.moduleConstants[moduleIndex].driveConstants.kTurningMotorChannel,
                                          MotorType.kBrushless);
         m_turningMotor.restoreFactoryDefaults();
@@ -124,6 +111,20 @@ public class SwerveModule extends SubsystemBase {
         m_turningEncoderCPR = m_turningEncoder.getCountsPerRevolution();
         m_turningEncoder.setPositionConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kPositionConversionFactor );
         m_turningEncoderAccumPos = 0;
+
+        // network table entries
+        String tableName = "SwerveModule " + m_moduleIndex;
+        // Get the swerve module table with module index
+        swerveModuleTable = NetworkTableInstance.getDefault().getTable(tableName);
+
+        // Create the entries
+        desiredSpeedEntry = swerveModuleTable.getEntry("Desired speed (m/s)");
+        desiredAngleEntry = swerveModuleTable.getEntry("Desired angle (radians)");
+        currentSpeedEntry = swerveModuleTable.getEntry("Current speed (m/s)");
+        currentAngleEntry = swerveModuleTable.getEntry("Current angle (radians)");
+        speedError = swerveModuleTable.getEntry("speed Error");
+        angleError = swerveModuleTable.getEntry("angle Error");
+
     }
 
     /**
@@ -179,6 +180,17 @@ public class SwerveModule extends SubsystemBase {
         m_turningMotor.set(turnOutput);       
 
         //@todo: send to the network table for debugging
+        updateNetworkTable(state.speedMetersPerSecond, state.angle.getRadians());
+    }
+
+    public void updateNetworkTable( double desiredSpeed, double desiredAngle )
+    {
+        desiredSpeedEntry.setDouble(desiredSpeed);
+        desiredAngleEntry.setDouble(desiredAngle);
+        currentSpeedEntry.setDouble(getModuleCurrentSpeedMetersPerSecond());
+        currentAngleEntry.setDouble(getModuleCurrentAngle().getRadians());
+        speedError.setDouble(desiredSpeed - getModuleCurrentSpeedMetersPerSecond());
+        angleError.setDouble(desiredAngle - getModuleCurrentAngle().getRadians());
 
     }
 
@@ -186,7 +198,7 @@ public class SwerveModule extends SubsystemBase {
     public void resetEncoders() {
 
         //not needed for velocity
-        //m_driveEncoder.setPosition(0);
+        m_driveEncoder.setPosition(0);
 
         //@todo: set to the land field value
         m_turningEncoder.setPosition(0);
@@ -195,6 +207,7 @@ public class SwerveModule extends SubsystemBase {
     @Override
     public void periodic() {
         //track the turning position here?
+        m_turningEncoderAccumPos = m_turningEncoder.getPosition();
 
         //debugging
 
