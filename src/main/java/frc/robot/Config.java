@@ -102,6 +102,7 @@ public final class Config {
   //@todo: clean up
   public static final class OIConstants {
     public static final int kDriverControllerPort = 1;
+    public static final int PIGEON_ID = 27;  //<-- TBD
   }
   
   public Config()

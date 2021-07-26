@@ -4,39 +4,65 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import frc.robot.Config.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.SwerveModule;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import frc.robot.Config;
+import frc.robot.subsystems.SwerveModule;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystemSM extends SubsystemBase {
-    // Robot swerve modules
+    // Robot swerve module
     private final SwerveModule m_singleModule = new SwerveModule(0);
 
     // The gyro sensor
-    private final Gyro m_gyro = new ADXRS450_Gyro();
-
+    private final PigeonIMU m_pigeon;
+    private PigeonIMU.FusionStatus fusionStatus; 
+  
     // Odometry class for tracking robot pose
-    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Config.kDriveKinematics, m_gyro.getRotation2d());
+    // NOTE: for the single module, we use the differenctial drive odometry
+    DifferentialDriveOdometry  m_odometry; 
 
     /** Creates a new DriveSubsystem. */
     public DriveSubsystemSM() {
+ 
+        if( Config.OIConstants.PIGEON_ID != -1)
+        {
+            m_pigeon = new PigeonIMU(Config.OIConstants.PIGEON_ID);
+            fusionStatus = new PigeonIMU.FusionStatus();
+        }
+        else
+        {
+            m_pigeon = null;
+        }
+        
+        m_odometry = new DifferentialDriveOdometry( new Rotation2d(), new Pose2d() );
     }
 
     @Override
     public void periodic() {
+
         // Update the odometry in the periodic block
-        m_odometry.update(m_gyro.getRotation2d(), m_singleModule.getState());
+        m_odometry.update(Rotation2d.fromDegrees(getCurrentAngleDegrees()), 
+                          m_singleModule.getCurrentDriveDistance(), 
+                          m_singleModule.getCurrentDriveDistance());
+    }
+
+    public double getCurrentAngleDegrees()
+    {
+        if( m_pigeon != null )
+        {
+            return m_pigeon.getFusedHeading(fusionStatus) ;
+         }
+        else
+        {
+            return 0.0;
+        }
     }
 
     /**
@@ -54,7 +80,7 @@ public class DriveSubsystemSM extends SubsystemBase {
      * @param pose The pose to which to set the odometry.
      */
     public void resetOdometry(Pose2d pose) {
-        m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+        m_odometry.resetPosition(pose, Rotation2d.fromDegrees(getCurrentAngleDegrees()));
     }
 
     /**
@@ -68,26 +94,35 @@ public class DriveSubsystemSM extends SubsystemBase {
      */
     @SuppressWarnings("ParameterName")
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-        // var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        //         fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
-        //                 : new ChassisSpeeds(xSpeed, ySpeed, rot));
-        // SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-        // m_frontLeft.setDesiredState(swerveModuleStates[0]);
-        // m_frontRight.setDesiredState(swerveModuleStates[1]);
-        // m_rearLeft.setDesiredState(swerveModuleStates[2]);
-        // m_rearRight.setDesiredState(swerveModuleStates[3]);
 
-
-
-        //for the single module: chassis speed = single module state
-        ChassisSpeeds chassisSpeed = fieldRelative ? 
-                                     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+        ChassisSpeeds chassisSpeeds = fieldRelative ? 
+                                     ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, 
+                                                                        Rotation2d.fromDegrees(getCurrentAngleDegrees()))
                                      : new ChassisSpeeds(xSpeed, ySpeed, rot);
-
-        //convert the chassisSpeed to the module state
-        SwerveModuleState desiredState = new SwerveModuleState(Math.sqrt(xSpeed*xSpeed+ySpeed*ySpeed), new Rotation2d(Math.atan(ySpeed/xSpeed) + rot));
+        
+        SwerveModuleState desiredState = convertChassisSpeedsToSMState( chassisSpeeds );
         m_singleModule.setDesiredState(desiredState);
+    }
 
+    /**
+     * @brief Convert the chassisSpeed to the module state
+     *        (for the single module: chassis speed --> single module state)
+     *        
+     * @param chassisSpeeds
+     * @return single module state
+     */
+    public SwerveModuleState convertChassisSpeedsToSMState( ChassisSpeeds chassisSpeeds )
+    {
+        double xSpeed = chassisSpeeds.vxMetersPerSecond;
+        double ySpeed = chassisSpeeds.vyMetersPerSecond;
+        //double omega  = chassisSpeeds.omegaRadiansPerSecond;
+
+        double speed = Math.sqrt(xSpeed * xSpeed + ySpeed * ySpeed); 
+        Rotation2d angle = new Rotation2d( Math.atan(ySpeed/xSpeed)); 
+
+        SwerveModuleState moduleState = new SwerveModuleState(speed, angle);
+
+        return moduleState;
     }
 
     /**
@@ -107,26 +142,12 @@ public class DriveSubsystemSM extends SubsystemBase {
     
     }
 
-    /** Zeroes the heading of the robot. */
-    public void zeroHeading() {
-        m_gyro.reset();
-    }
-
-    /**
-     * Returns the heading of the robot.
-     *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    public double getHeading() {
-        return m_gyro.getRotation2d().getDegrees();
-    }
-
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    public double getTurnRate() {
-        return m_gyro.getRate() * (Config.kGyroReversed ? -1.0 : 1.0);
-    }
+    //  /**
+    //  * Returns the turn rate of the robot.
+    //  *
+    //  * @return The turn rate of the robot, in degrees per second
+    //  */
+    // public double getTurnRate() {
+    //     return m_gyro.getRate() * (Config.kGyroReversed ? -1.0 : 1.0);
+    // }
 }

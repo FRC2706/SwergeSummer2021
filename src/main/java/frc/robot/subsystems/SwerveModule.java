@@ -25,7 +25,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class SwerveModule extends SubsystemBase {
+public class SwerveModule {
 
     private int m_moduleIndex;
 
@@ -144,7 +144,7 @@ public class SwerveModule extends SubsystemBase {
                 * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI)
                 / (double) m_driveEncoderCPR)
                 / Config.CANDEncoderConstants.SECOND_PER_MINUTE;
-     }
+    }
 
     public Rotation2d getModuleCurrentAngle()
     {
@@ -204,13 +204,11 @@ public class SwerveModule extends SubsystemBase {
         m_turningEncoder.setPosition(0);
     }
 
-    @Override
-    public void periodic() {
-        //track the turning position here?
-        m_turningEncoderAccumPos = m_turningEncoder.getPosition();
-
-        //debugging
-
+    //only for the single module
+    public double getCurrentDriveDistance()
+    {
+        return (m_driveEncoder.getPosition() * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI)
+        / (double) m_driveEncoderCPR);
 
     }
 }
