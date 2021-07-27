@@ -67,10 +67,10 @@ public class RobotContainer {
       Joystick joyStick1 = new Joystick(1);
 
       //Instantiate the command and bind it
-      Command singleModuleOnce0 = new SingleModuleOnce();
+      Command singleModuleOnce0 = new SingleModuleOnce(0.3, 45);
       new JoystickButton(joyStick1, XboxController.Button.kBumberLeft.value).whenHeld(singleModuleOnce0);
 
-      Command singleModuleOnce1 = new SingleModuleOnce();  
+      Command singleModuleOnce1 = new SingleModuleOnce(2.0, 315);  
       new JoystickButton(joystick1, XboxController.Button.KBumberRight.value).whenHeld(singleModuleOnce1);
   }
 
