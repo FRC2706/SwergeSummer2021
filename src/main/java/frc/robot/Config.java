@@ -29,7 +29,7 @@ public final class Config {
     public Translation2d kTranslation2dKinematics;
   }
 
-  public class DriveCANPIDConstants {
+  public class CANPIDConstants {
     public double minPower;
     public double maxPower;
     public double kFF;
@@ -39,13 +39,13 @@ public final class Config {
     public double kIZone;    
   }
 
-  public class TurnProfiledPIDConstants {
-    public double kMaxAngularSpeedRadiansPerSecond;
-    public double kMaxAngularAccelerationRadiansPerSecond;
-    public double kP;
-    public double kI;
-    public double kD;
-  }
+  // public class TurnProfiledPIDConstants {
+  //   public double kMaxAngularSpeedRadiansPerSecond;
+  //   public double kMaxAngularAccelerationRadiansPerSecond;
+  //   public double kP;
+  //   public double kI;
+  //   public double kD;
+  // }
 
   public class CANDEncoderConstants {
     public static final int SECOND_PER_MINUTE = 60;
@@ -59,9 +59,9 @@ public final class Config {
     //driveConstants
     public DriveConstants driveConstants;
     //drivePID
-    public DriveCANPIDConstants driveCANPIDConstants;
+    public CANPIDConstants driveCANPIDConstants;
     //turningPID
-    public TurnProfiledPIDConstants turnProfiledPIDConstants;
+    public CANPIDConstants turnCANPIDConstants;
     //encoders
     public CANDEncoderConstants encoderConstants;
   }
@@ -109,7 +109,7 @@ public final class Config {
   {
     moduleConstants = new ModuleConstants[4];
  
-    //module Index 0 :front left/single module
+    //module Index 0 : /single module
     moduleConstants[0].driveConstants = new DriveConstants();
     moduleConstants[0].driveConstants.kDriveMotorChannel = 0;
     moduleConstants[0].driveConstants.kTurningMotorChannel = 1;
@@ -117,7 +117,7 @@ public final class Config {
     moduleConstants[0].driveConstants.kTurningMotorInverted = false;
     moduleConstants[0].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, kTrackWidth / 2);
 
-    moduleConstants[0].driveCANPIDConstants = new DriveCANPIDConstants();
+    moduleConstants[0].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[0].driveCANPIDConstants.minPower = -1;
     moduleConstants[0].driveCANPIDConstants.maxPower = 1;
     moduleConstants[0].driveCANPIDConstants.kFF = 1.;
@@ -126,19 +126,21 @@ public final class Config {
     moduleConstants[0].driveCANPIDConstants.kD = 0.;
     moduleConstants[0].driveCANPIDConstants.kIZone = 0;
 
-    moduleConstants[0].turnProfiledPIDConstants = new TurnProfiledPIDConstants();
-    moduleConstants[0].turnProfiledPIDConstants.kMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[0].turnProfiledPIDConstants.kMaxAngularAccelerationRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[0].turnProfiledPIDConstants.kP = 1.;
-    moduleConstants[0].turnProfiledPIDConstants.kI = 0.;
-    moduleConstants[0].turnProfiledPIDConstants.kD = 0.;
+    moduleConstants[0].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[0].turnCANPIDConstants.minPower = -1;
+    moduleConstants[0].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[0].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[0].turnCANPIDConstants.kP = 1.;
+    moduleConstants[0].turnCANPIDConstants.kI = 0.;
+    moduleConstants[0].turnCANPIDConstants.kD = 0.;
+    moduleConstants[0].turnCANPIDConstants.kIZone = 0;
 
     moduleConstants[0].encoderConstants = new CANDEncoderConstants();
     moduleConstants[0].encoderConstants.kWheelDiameterMeters = 0.15;
     moduleConstants[0].encoderConstants.kVelocityConversionFactor = 1.;
     moduleConstants[0].encoderConstants.kPositionConversionFactor = 1.;
 
-    //module Index 1: front right 
+    //module Index 1: 
     moduleConstants[1].driveConstants = new DriveConstants();
     moduleConstants[1].driveConstants.kDriveMotorChannel = 0;
     moduleConstants[1].driveConstants.kTurningMotorChannel = 1;
@@ -146,7 +148,7 @@ public final class Config {
     moduleConstants[1].driveConstants.kTurningMotorInverted = false;
     moduleConstants[1].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, -kTrackWidth / 2);
 
-    moduleConstants[1].driveCANPIDConstants = new DriveCANPIDConstants();
+    moduleConstants[1].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[1].driveCANPIDConstants.minPower = -1;
     moduleConstants[1].driveCANPIDConstants.maxPower = 1;
     moduleConstants[1].driveCANPIDConstants.kFF = 1.;
@@ -155,19 +157,21 @@ public final class Config {
     moduleConstants[1].driveCANPIDConstants.kD = 0.;
     moduleConstants[1].driveCANPIDConstants.kIZone = 0;
 
-    moduleConstants[1].turnProfiledPIDConstants = new TurnProfiledPIDConstants();
-    moduleConstants[1].turnProfiledPIDConstants.kMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[1].turnProfiledPIDConstants.kMaxAngularAccelerationRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[1].turnProfiledPIDConstants.kP = 1.;
-    moduleConstants[1].turnProfiledPIDConstants.kI = 0.;
-    moduleConstants[1].turnProfiledPIDConstants.kD = 0.;
+    moduleConstants[1].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[1].turnCANPIDConstants.minPower = -1;
+    moduleConstants[1].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[1].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[1].turnCANPIDConstants.kP = 1.;
+    moduleConstants[1].turnCANPIDConstants.kI = 0.;
+    moduleConstants[1].turnCANPIDConstants.kD = 0.;
+    moduleConstants[1].turnCANPIDConstants.kIZone = 0;
 
     moduleConstants[1].encoderConstants = new CANDEncoderConstants();
     moduleConstants[1].encoderConstants.kWheelDiameterMeters = 0.15;
     moduleConstants[1].encoderConstants.kVelocityConversionFactor = 1.;
     moduleConstants[1].encoderConstants.kPositionConversionFactor = 1.;
 
-    //module Index 2: rear left
+    //module Index 2: 
     moduleConstants[2].driveConstants = new DriveConstants();
     moduleConstants[2].driveConstants.kDriveMotorChannel = 0;
     moduleConstants[2].driveConstants.kTurningMotorChannel = 1;
@@ -175,7 +179,7 @@ public final class Config {
     moduleConstants[2].driveConstants.kTurningMotorInverted = false;
     moduleConstants[2].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
 
-    moduleConstants[2].driveCANPIDConstants = new DriveCANPIDConstants();
+    moduleConstants[2].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[2].driveCANPIDConstants.minPower = -1;
     moduleConstants[2].driveCANPIDConstants.maxPower = 1;
     moduleConstants[2].driveCANPIDConstants.kFF = 1.;
@@ -184,19 +188,21 @@ public final class Config {
     moduleConstants[2].driveCANPIDConstants.kD = 0.;
     moduleConstants[2].driveCANPIDConstants.kIZone = 0;
 
-    moduleConstants[2].turnProfiledPIDConstants = new TurnProfiledPIDConstants();
-    moduleConstants[2].turnProfiledPIDConstants.kMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[2].turnProfiledPIDConstants.kMaxAngularAccelerationRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[2].turnProfiledPIDConstants.kP = 1.;
-    moduleConstants[2].turnProfiledPIDConstants.kI = 0.;
-    moduleConstants[2].turnProfiledPIDConstants.kD = 0.;
+    moduleConstants[2].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[2].turnCANPIDConstants.minPower = -1;
+    moduleConstants[2].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[2].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[2].turnCANPIDConstants.kP = 1.;
+    moduleConstants[2].turnCANPIDConstants.kI = 0.;
+    moduleConstants[2].turnCANPIDConstants.kD = 0.;
+    moduleConstants[2].turnCANPIDConstants.kIZone = 0;
 
     moduleConstants[2].encoderConstants = new CANDEncoderConstants();
     moduleConstants[2].encoderConstants.kWheelDiameterMeters = 0.15;
     moduleConstants[2].encoderConstants.kVelocityConversionFactor = 1.;
     moduleConstants[2].encoderConstants.kPositionConversionFactor = 1.;
 
-    //module Index 3: rear right
+    //module Index 3: 
     moduleConstants[3].driveConstants = new DriveConstants();
     moduleConstants[3].driveConstants.kDriveMotorChannel = 0;
     moduleConstants[3].driveConstants.kTurningMotorChannel = 1;
@@ -204,7 +210,7 @@ public final class Config {
     moduleConstants[3].driveConstants.kTurningMotorInverted = false;
     moduleConstants[3].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
 
-    moduleConstants[3].driveCANPIDConstants = new DriveCANPIDConstants();
+    moduleConstants[3].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[3].driveCANPIDConstants.minPower = -1;
     moduleConstants[3].driveCANPIDConstants.maxPower = 1;
     moduleConstants[3].driveCANPIDConstants.kFF = 1.;
@@ -213,12 +219,14 @@ public final class Config {
     moduleConstants[3].driveCANPIDConstants.kD = 0.;
     moduleConstants[3].driveCANPIDConstants.kIZone = 0;
 
-    moduleConstants[3].turnProfiledPIDConstants = new TurnProfiledPIDConstants();
-    moduleConstants[3].turnProfiledPIDConstants.kMaxAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[3].turnProfiledPIDConstants.kMaxAngularAccelerationRadiansPerSecond = 2 * Math.PI;
-    moduleConstants[3].turnProfiledPIDConstants.kP = 1.;
-    moduleConstants[3].turnProfiledPIDConstants.kI = 0.;
-    moduleConstants[3].turnProfiledPIDConstants.kD = 0.;
+    moduleConstants[3].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[3].turnCANPIDConstants.minPower = -1;
+    moduleConstants[3].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[3].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[3].turnCANPIDConstants.kP = 1.;
+    moduleConstants[3].turnCANPIDConstants.kI = 0.;
+    moduleConstants[3].turnCANPIDConstants.kD = 0.;
+    moduleConstants[3].turnCANPIDConstants.kIZone = 0;
 
     moduleConstants[3].encoderConstants = new CANDEncoderConstants();
     moduleConstants[3].encoderConstants.kWheelDiameterMeters = 0.15;
