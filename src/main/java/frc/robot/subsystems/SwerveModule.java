@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.AnalogEncoder;
-import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
 
 import frc.robot.Config;
 import frc.robot.subsystems.ContinousPIDSparkMax;
@@ -37,18 +36,12 @@ public class SwerveModule {
     private CANSparkMax m_turningMotor;
     private CANEncoder m_turningEncoder;
     private CANPIDController m_turningPIDController;
-
-    // Using a TrapezoidProfile PIDController to allow for smooth turning
-    //It is slower than CANPIDController. However, it has the feature of smooth angle inputs.
-    //private final ProfiledPIDController m_turningPIDController;
-    
+  
     //@todo: lamprey encoder
     //AnalogEncoder m_analogEncoder;
 
     private int m_driveEncoderCPR;
     private int m_turningEncoderCPR;
-
-    private double m_turningEncoderAccumPos;
 
     private NetworkTable      swerveModuleTable;
     private NetworkTableEntry desiredSpeedEntry ;
@@ -61,7 +54,7 @@ public class SwerveModule {
     /**
      * Constructs a SwerveModule.
      *
-     * @param moduleIndex   ID for the drive motor.
+     * @param moduleIndex   ID for the drive motor. (TBD)
      *        0 - frontLeft/single module
      *        1 - frontRight  
      *        2 - rearLeft
@@ -97,18 +90,6 @@ public class SwerveModule {
         m_turningMotor.restoreFactoryDefaults();
         m_turningMotor.setInverted(Config.moduleConstants[moduleIndex].driveConstants.kTurningMotorInverted);
 
-        // m_turningPIDController = new ProfiledPIDController(
-        //     Config.moduleConstants[moduleIndex].turnProfiledPIDConstants.kP, 
-        //     Config.moduleConstants[moduleIndex].turnProfiledPIDConstants.kI, 
-        //     Config.moduleConstants[moduleIndex].turnProfiledPIDConstants.kD,
-        //     new TrapezoidProfile.Constraints( Config.moduleConstants[moduleIndex].turnProfiledPIDConstants.kMaxAngularSpeedRadiansPerSecond ,
-        //                                       Config.moduleConstants[moduleIndex].turnProfiledPIDConstants.kMaxAngularAccelerationRadiansPerSecond));
-        
-        // Limit the PID Controller's input range between -pi and pi and set the input
-        // to be continuous.
-        // m_turningPIDController.enableContinuousInput(-Math.PI, Math.PI); //missing from SparkMax
-        // m_turningPIDController.reset(0.0);
-
         m_turningPIDController = m_turningMotor.getPIDController();
         m_turningPIDController.setOutputRange( Config.moduleConstants[moduleIndex].turnCANPIDConstants.minPower, 
                                              Config.moduleConstants[moduleIndex].turnCANPIDConstants.maxPower);
@@ -125,7 +106,6 @@ public class SwerveModule {
         m_turningEncoder = m_turningMotor.getEncoder();
         m_turningEncoderCPR = m_turningEncoder.getCountsPerRevolution();
         m_turningEncoder.setPositionConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kPositionConversionFactor );
-        m_turningEncoderAccumPos = 0;
 
         // network table entries
         String tableName = "SwerveModule " + m_moduleIndex;
@@ -191,13 +171,7 @@ public class SwerveModule {
 
         m_drivePIDController.setReference(convertSpeedToRPM(state.speedMetersPerSecond), 
                                           ControlType.kVelocity);
-
-        // // Calculate the turning motor output from the turning PID controller.
-        // final var turnOutput = m_turningPIDController.calculate(getModuleCurrentAngle().getRadians(),
-        //                                                         state.angle.getRadians());
-        // // Calculate the turning motor output from the turning PID controller.
-        // m_turningMotor.set(turnOutput);  
-        
+   
         Rotation2d angleReference = ContinousPIDSparkMax.calculate(state.angle, getModuleCurrentAngle());
 
         m_turningPIDController.setReference(convertAngleToPos(angleReference.getRadians()), ControlType.kPosition);

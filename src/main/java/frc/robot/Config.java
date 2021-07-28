@@ -39,14 +39,6 @@ public final class Config {
     public double kIZone;    
   }
 
-  // public class TurnProfiledPIDConstants {
-  //   public double kMaxAngularSpeedRadiansPerSecond;
-  //   public double kMaxAngularAccelerationRadiansPerSecond;
-  //   public double kP;
-  //   public double kI;
-  //   public double kD;
-  // }
-
   public class CANDEncoderConstants {
     public static final int SECOND_PER_MINUTE = 60;
     public double kWheelDiameterMeters;
