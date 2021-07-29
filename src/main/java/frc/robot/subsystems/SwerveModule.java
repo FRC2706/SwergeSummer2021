@@ -99,10 +99,6 @@ public class SwerveModule {
         m_turningPIDController.setD(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kD);
         m_turningPIDController.setIZone(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kIZone);
 
-        m_driveEncoder = m_driveMotor.getEncoder();
-        m_driveEncoderCPR = m_driveEncoder.getCountsPerRevolution();
-        m_driveEncoder.setVelocityConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kVelocityConversionFactor);
-
         m_turningEncoder = m_turningMotor.getEncoder();
         m_turningEncoderCPR = m_turningEncoder.getCountsPerRevolution();
         m_turningEncoder.setPositionConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kPositionConversionFactor );
@@ -137,8 +133,7 @@ public class SwerveModule {
         //m_driveEncoder.getVelocity();  //--> unit RPM --> m/s
         return (m_driveEncoder.getVelocity()
                 * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI)
-                / (double) m_driveEncoderCPR)
-                / Config.CANDEncoderConstants.SECOND_PER_MINUTE;
+                / Config.CANDEncoderConstants.SECOND_PER_MINUTE);
     }
 
     public Rotation2d getModuleCurrentAngle()
@@ -149,7 +144,7 @@ public class SwerveModule {
 
     public double convertSpeedToRPM( double speedMetersPerSecond )
     {
-        return (speedMetersPerSecond * (double) m_driveEncoderCPR
+        return (speedMetersPerSecond 
                 * Config.CANDEncoderConstants.SECOND_PER_MINUTE
                 / (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI) );
     }
@@ -204,8 +199,6 @@ public class SwerveModule {
     //only for the single module
     public double getCurrentDriveDistance()
     {
-        return (m_driveEncoder.getPosition() * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI)
-        / (double) m_driveEncoderCPR);
-
+        return (m_driveEncoder.getPosition() * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI));       
     }
 }
