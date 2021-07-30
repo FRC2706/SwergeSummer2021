@@ -139,7 +139,7 @@ public class SwerveModule {
     public Rotation2d getModuleCurrentAngle()
     {
         //m_turningEncoder.getPosition(); //native units of rotation
-        return (new Rotation2d(m_turningEncoder.getPosition() *  (2 * Math.PI) / (double) m_turningEncoderCPR));
+        return (new Rotation2d(m_turningEncoder.getPosition() *  (2 * Math.PI) ));
     }
 
     public double convertSpeedToRPM( double speedMetersPerSecond )
@@ -151,7 +151,7 @@ public class SwerveModule {
 
     public double convertAngleToPos( double angleRadius )
     {
-        return angleRadius * m_turningEncoderCPR / ( 2*Math.PI );
+        return angleRadius / ( 2*Math.PI );
     }
 
     /**
