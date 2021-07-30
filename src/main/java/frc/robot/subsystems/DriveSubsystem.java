@@ -19,12 +19,16 @@ import frc.robot.Config;
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
     // Robot swerve modules
+    //1 is top left
     private final SwerveModule m_frontLeft = new SwerveModule(0);
 
+    //2 is bottom left
     private final SwerveModule m_rearLeft = new SwerveModule(1);
 
+    //3 is bottom right
     private final SwerveModule m_frontRight = new SwerveModule(2);
 
+    //4 is top left
     private final SwerveModule m_rearRight = new SwerveModule(3);
 
     // The gyro sensor
