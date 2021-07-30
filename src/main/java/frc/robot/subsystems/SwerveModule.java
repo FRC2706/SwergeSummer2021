@@ -104,7 +104,7 @@ public class SwerveModule {
         m_turningEncoder.setPositionConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kPositionConversionFactor );
 
         // network table entries
-        String tableName = "SwerveModule " + m_moduleIndex;
+        String tableName = "Swerve Chassis/SwerveModule " + m_moduleIndex;
         // Get the swerve module table with module index
         swerveModuleTable = NetworkTableInstance.getDefault().getTable(tableName);
 
