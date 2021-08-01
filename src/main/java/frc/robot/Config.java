@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import javax.lang.model.util.ElementScanner6;
+
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -232,5 +234,22 @@ public final class Config {
                                     moduleConstants[2].driveConstants.kTranslation2dKinematics,
                                     moduleConstants[3].driveConstants.kTranslation2dKinematics);
   
+  //Valid module index is 1,2,3,4
+  //1 is top left
+  //2 is bottom left
+  //3 is bottom right
+  //4 is top right
+  public static ModuleConstants module(int modIndex)
+  {
+    if(modIndex >=1 && modIndex <=4)
+    {
+      return moduleConstants[modIndex-1];
+    }
+    else
+    {
+      System.out.println("Config module: Invalid module index");
+      return null;
+    }
+  }
 
 }

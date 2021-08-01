@@ -18,7 +18,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystemSM extends SubsystemBase {
     // Robot swerve modules
-    private final SwerveModule m_singleModule = new SwerveModule(0);
+    private final SwerveModule m_singleModule = new SwerveModule(1);
 
     private DriveSubsystemSM instance;
 

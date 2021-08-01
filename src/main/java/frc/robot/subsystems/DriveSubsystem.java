@@ -19,17 +19,17 @@ import frc.robot.Config;
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
     // Robot swerve modules
-    //1 is top left
-    private final SwerveModule m_frontLeft = new SwerveModule(0);
+    //1 is front left
+    private final SwerveModule m_frontLeft = new SwerveModule(1);
 
-    //2 is bottom left
-    private final SwerveModule m_rearLeft = new SwerveModule(1);
+    //2 is rear left
+    private final SwerveModule m_rearLeft = new SwerveModule(2);
 
-    //3 is bottom right
-    private final SwerveModule m_frontRight = new SwerveModule(2);
-
-    //4 is top left
+    //3 is rear right
     private final SwerveModule m_rearRight = new SwerveModule(3);
+
+    //4 is front right
+    private final SwerveModule m_frontRight = new SwerveModule(4);
 
     // The gyro sensor
     private final Gyro m_gyro = new ADXRS450_Gyro();
@@ -45,7 +45,7 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // Update the odometry in the periodic block
         m_odometry.update(m_gyro.getRotation2d(), m_frontLeft.getState(), m_rearLeft.getState(),
-                m_frontRight.getState(), m_rearRight.getState());
+                m_rearRight.getState(), m_frontRight.getState());
     }
 
     /**
@@ -82,9 +82,10 @@ public class DriveSubsystem extends SubsystemBase {
                         : new ChassisSpeeds(xSpeed, ySpeed, rot));
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Config.AutoConstants.kMaxSpeedMetersPerSecond);
         m_frontLeft.setDesiredState(swerveModuleStates[0]);
-        m_frontRight.setDesiredState(swerveModuleStates[1]);
-        m_rearLeft.setDesiredState(swerveModuleStates[2]);
-        m_rearRight.setDesiredState(swerveModuleStates[3]);
+        m_rearLeft.setDesiredState(swerveModuleStates[1]);
+        m_rearRight.setDesiredState(swerveModuleStates[2]);
+        m_frontRight.setDesiredState(swerveModuleStates[3]);
+
     }
 
     /**
@@ -95,17 +96,17 @@ public class DriveSubsystem extends SubsystemBase {
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Config.AutoConstants.kMaxSpeedMetersPerSecond);
         m_frontLeft.setDesiredState(desiredStates[0]);
-        m_frontRight.setDesiredState(desiredStates[1]);
-        m_rearLeft.setDesiredState(desiredStates[2]);
-        m_rearRight.setDesiredState(desiredStates[3]);
+        m_rearLeft.setDesiredState(desiredStates[1]);
+        m_rearRight.setDesiredState(desiredStates[2]);
+        m_frontRight.setDesiredState(desiredStates[3]);
     }
 
     /** Resets the drive encoders to currently read a position of 0. */
     public void resetEncoders() {
         m_frontLeft.resetEncoders();
         m_rearLeft.resetEncoders();
-        m_frontRight.resetEncoders();
         m_rearRight.resetEncoders();
+        m_frontRight.resetEncoders();
     }
 
     /** Zeroes the heading of the robot. */
