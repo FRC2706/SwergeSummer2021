@@ -233,4 +233,16 @@ public final class Config {
                                     moduleConstants[3].driveConstants.kTranslation2dKinematics);
   
 
+  public static ModuleConstants module (int moduleIndex)
+  {
+    if( moduleIndex >=1 || moduleIndex <=4 )
+    {
+      return moduleConstants[moduleIndex-1];
+    }
+    else
+    {
+      System.out.println("Config.module: invalid module index.");
+      return null;
+    }    
+  }
 }
