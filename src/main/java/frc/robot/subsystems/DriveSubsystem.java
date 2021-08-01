@@ -19,12 +19,11 @@ import frc.robot.Config;
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
     // Robot swerve modules
-
-    private final SwerveModule m_frontLeft  = new SwerveModule(0);
-    private final SwerveModule m_rearLeft   = new SwerveModule(1);
-    private final SwerveModule m_frontRight = new SwerveModule(2);
+    private final SwerveModule m_frontLeft  = new SwerveModule(1);
+    private final SwerveModule m_rearLeft   = new SwerveModule(2);
     private final SwerveModule m_rearRight  = new SwerveModule(3);
-
+    private final SwerveModule m_frontRight = new SwerveModule(4);
+    
     // The gyro sensor
     private final Gyro m_gyro = new ADXRS450_Gyro();
 
@@ -77,8 +76,8 @@ public class DriveSubsystem extends SubsystemBase {
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Config.AutoConstants.kMaxSpeedMetersPerSecond);
         m_frontLeft.setDesiredState(swerveModuleStates[0]);
         m_frontRight.setDesiredState(swerveModuleStates[1]);
-        m_rearLeft.setDesiredState(swerveModuleStates[2]);
-        m_rearRight.setDesiredState(swerveModuleStates[3]);
+        m_rearRight.setDesiredState(swerveModuleStates[2]);
+        m_rearLeft.setDesiredState(swerveModuleStates[3]);
     }
 
     /**
@@ -90,8 +89,8 @@ public class DriveSubsystem extends SubsystemBase {
         SwerveDriveKinematics.normalizeWheelSpeeds(desiredStates, Config.AutoConstants.kMaxSpeedMetersPerSecond);
         m_frontLeft.setDesiredState(desiredStates[0]);
         m_frontRight.setDesiredState(desiredStates[1]);
-        m_rearLeft.setDesiredState(desiredStates[2]);
-        m_rearRight.setDesiredState(desiredStates[3]);
+        m_rearRight.setDesiredState(desiredStates[2]);
+        m_rearLeft.setDesiredState(desiredStates[3]);
     }
 
     /** Resets the drive encoders to currently read a position of 0. */

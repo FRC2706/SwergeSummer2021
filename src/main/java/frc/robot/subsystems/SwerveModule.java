@@ -55,53 +55,53 @@ public class SwerveModule {
      * Constructs a SwerveModule.
      *
      * @param moduleIndex   ID for the drive motor. (TBD)
-     *        0 - frontLeft/single module
-     *        1 - frontRight  
-     *        2 - rearLeft
-     *        3 - rearRight
+     *        1 - top Left/single module
+     *        2 - bottom left  
+     *        3 - bottom right
+     *        4 - top right
      */
     public SwerveModule( int moduleIndex ) {
         //module index
         m_moduleIndex = moduleIndex;
 
         //driver motor controller
-        m_driveMotor = new CANSparkMax(Config.moduleConstants[moduleIndex].driveConstants.kDriveMotorChannel, 
+        m_driveMotor = new CANSparkMax(Config.module(moduleIndex).driveConstants.kDriveMotorChannel, 
                                        MotorType.kBrushless);
         // Factory Default to prevent unexpected behaviour
         m_driveMotor.restoreFactoryDefaults();
-        m_driveMotor.setInverted(Config.moduleConstants[moduleIndex].driveConstants.kDriveMotorInverted);
+        m_driveMotor.setInverted(Config.module(moduleIndex).driveConstants.kDriveMotorInverted);
 
         m_drivePIDController = m_driveMotor.getPIDController();
-        m_drivePIDController.setOutputRange( Config.moduleConstants[moduleIndex].driveCANPIDConstants.minPower, 
-                                             Config.moduleConstants[moduleIndex].driveCANPIDConstants.maxPower);
-        m_drivePIDController.setFF(Config.moduleConstants[moduleIndex].driveCANPIDConstants.kFF);
-        m_drivePIDController.setP(Config.moduleConstants[moduleIndex].driveCANPIDConstants.kP);
-        m_drivePIDController.setI(Config.moduleConstants[moduleIndex].driveCANPIDConstants.kI);
-        m_drivePIDController.setD(Config.moduleConstants[moduleIndex].driveCANPIDConstants.kD);
-        m_drivePIDController.setIZone(Config.moduleConstants[moduleIndex].driveCANPIDConstants.kIZone);
+        m_drivePIDController.setOutputRange( Config.module(moduleIndex).driveCANPIDConstants.minPower, 
+                                             Config.module(moduleIndex).driveCANPIDConstants.maxPower);
+        m_drivePIDController.setFF(Config.module(moduleIndex).driveCANPIDConstants.kFF);
+        m_drivePIDController.setP(Config.module(moduleIndex).driveCANPIDConstants.kP);
+        m_drivePIDController.setI(Config.module(moduleIndex).driveCANPIDConstants.kI);
+        m_drivePIDController.setD(Config.module(moduleIndex).driveCANPIDConstants.kD);
+        m_drivePIDController.setIZone(Config.module(moduleIndex).driveCANPIDConstants.kIZone);
 
         m_driveEncoder = m_driveMotor.getEncoder();
         m_driveEncoderCPR = m_driveEncoder.getCountsPerRevolution();
-        m_driveEncoder.setVelocityConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kVelocityConversionFactor);
+        m_driveEncoder.setVelocityConversionFactor(Config.module(moduleIndex).encoderConstants.kVelocityConversionFactor);
 
         //turning motor controller
-        m_turningMotor = new CANSparkMax(Config.moduleConstants[moduleIndex].driveConstants.kTurningMotorChannel,
+        m_turningMotor = new CANSparkMax(Config.module(moduleIndex).driveConstants.kTurningMotorChannel,
                                          MotorType.kBrushless);
         m_turningMotor.restoreFactoryDefaults();
-        m_turningMotor.setInverted(Config.moduleConstants[moduleIndex].driveConstants.kTurningMotorInverted);
+        m_turningMotor.setInverted(Config.module(moduleIndex).driveConstants.kTurningMotorInverted);
 
         m_turningPIDController = m_turningMotor.getPIDController();
-        m_turningPIDController.setOutputRange( Config.moduleConstants[moduleIndex].turnCANPIDConstants.minPower, 
-                                             Config.moduleConstants[moduleIndex].turnCANPIDConstants.maxPower);
-        m_turningPIDController.setFF(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kFF);
-        m_turningPIDController.setP(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kP);
-        m_turningPIDController.setI(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kI);
-        m_turningPIDController.setD(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kD);
-        m_turningPIDController.setIZone(Config.moduleConstants[moduleIndex].turnCANPIDConstants.kIZone);
+        m_turningPIDController.setOutputRange( Config.module(moduleIndex).turnCANPIDConstants.minPower, 
+                                             Config.module(moduleIndex).turnCANPIDConstants.maxPower);
+        m_turningPIDController.setFF(Config.module(moduleIndex).turnCANPIDConstants.kFF);
+        m_turningPIDController.setP(Config.module(moduleIndex).turnCANPIDConstants.kP);
+        m_turningPIDController.setI(Config.module(moduleIndex).turnCANPIDConstants.kI);
+        m_turningPIDController.setD(Config.module(moduleIndex).turnCANPIDConstants.kD);
+        m_turningPIDController.setIZone(Config.module(moduleIndex).turnCANPIDConstants.kIZone);
 
         m_turningEncoder = m_turningMotor.getEncoder();
         m_turningEncoderCPR = m_turningEncoder.getCountsPerRevolution();
-        m_turningEncoder.setPositionConversionFactor(Config.moduleConstants[moduleIndex].encoderConstants.kPositionConversionFactor );
+        m_turningEncoder.setPositionConversionFactor(Config.module(moduleIndex).encoderConstants.kPositionConversionFactor );
 
         // network table entries
         String tableName = "SwerveModule " + m_moduleIndex;
