@@ -92,8 +92,9 @@ public class FluidConstant<T> implements Supplier<T> {
      */
     public void setValue(T newValue) {
         // Send the update to all the registered actions
-        this.updateActions.forEach(a -> a.accept(this.value, newValue));
+        T oldValue = this.value;
         this.value = newValue;
+        this.updateActions.forEach(a -> a.accept(oldValue, newValue));
     }
 
     /**
