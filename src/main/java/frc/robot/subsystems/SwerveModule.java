@@ -10,10 +10,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
 
-import edu.wpi.first.wpilibj.AnalogEncoder;
-
+import edu.wpi.first.wpilibj.AnalogPotentiometer;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Config;
-import frc.robot.subsystems.ContinousPIDSparkMax;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
@@ -37,8 +36,7 @@ public class SwerveModule {
     private CANEncoder m_turningEncoder;
     private CANPIDController m_turningPIDController;
   
-    //@todo: lamprey encoder
-    //AnalogEncoder m_analogEncoder;
+    private AnalogPotentiometer m_lamprey;
 
     private int m_driveEncoderCPR;
     private int m_turningEncoderCPR;
@@ -102,6 +100,16 @@ public class SwerveModule {
         m_turningEncoder = m_turningMotor.getEncoder();
         m_turningEncoderCPR = m_turningEncoder.getCountsPerRevolution();
         m_turningEncoder.setPositionConversionFactor(Config.module(moduleIndex).encoderConstants.kPositionConversionFactor );
+
+        // Lamprey encoder
+        m_lamprey = new AnalogPotentiometer(Config.module(moduleIndex).driveConstants.kLampreyChannel, 2*Math.PI);
+        
+        // Check if real match. (ie. robot is competing on a field being controlled by a Field Management System)
+        // If not a real match, enabled lamprey tuning through NetworkTables
+        // Calls updateTurningEncoderFromLamprey when networktable entry is updated.
+        if (DriverStation.getInstance().isFMSAttached() == false) {
+            Config.module(m_moduleIndex).driveConstants.kLampreyOffset.registerListener((oldValue, newValue) -> updateTurningEncoderFromLamprey());
+        }
 
         // network table entries
         String tableName = "Swerve Chassis/SwerveModule " + m_moduleIndex;
@@ -186,14 +194,13 @@ public class SwerveModule {
 
     }
 
-    /** Zeros all the SwerveModule encoders. */
-    public void resetEncoders() {
-
-        //not needed for velocity
-        m_driveEncoder.setPosition(0);
-
-        //@todo: set to the land field value
-        m_turningEncoder.setPosition(0);
+    public void updateTurningEncoderFromLamprey() {
+        // Get offset value from networktables
+        double offset = Config.module(m_moduleIndex).driveConstants.kLampreyOffset.get();
+        double lampreyRadians = m_lamprey.get();
+    
+        // Give the value from Lamprey to the SparkMax
+        m_turningEncoder.setPosition(convertAngleToPos(lampreyRadians + offset));
     }
 
     //only for the single module

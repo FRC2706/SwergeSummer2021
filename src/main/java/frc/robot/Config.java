@@ -6,9 +6,11 @@ package frc.robot;
 
 import javax.lang.model.util.ElementScanner6;
 
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
+import frc.robot.config.FluidConstant;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -29,6 +31,9 @@ public final class Config {
 
     //Note: encoder does not have inversion for the Brushless Mode.
     public Translation2d kTranslation2dKinematics;
+
+    public int kLampreyChannel;
+    public FluidConstant<Double> kLampreyOffset;
   }
 
   public class CANPIDConstants {
@@ -95,7 +100,9 @@ public final class Config {
 
   //@todo: clean up
   public static final class OIConstants {
-    public static final int kDriverControllerPort = 1;
+    public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
+
     public static final int PIGEON_ID = 27;  //<-- TBD
   }
   
@@ -110,6 +117,10 @@ public final class Config {
     moduleConstants[0].driveConstants.kDriveMotorInverted = false;
     moduleConstants[0].driveConstants.kTurningMotorInverted = false;
     moduleConstants[0].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, kTrackWidth / 2);
+    moduleConstants[0].driveConstants.kLampreyChannel = 0;
+    moduleConstants[0].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
+            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 1")); 
+
 
     moduleConstants[0].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[0].driveCANPIDConstants.minPower = -1;
@@ -141,6 +152,9 @@ public final class Config {
     moduleConstants[1].driveConstants.kDriveMotorInverted = false;
     moduleConstants[1].driveConstants.kTurningMotorInverted = false;
     moduleConstants[1].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, -kTrackWidth / 2);
+    moduleConstants[1].driveConstants.kLampreyChannel = 1;
+    moduleConstants[1].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
+            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 2")); 
 
     moduleConstants[1].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[1].driveCANPIDConstants.minPower = -1;
@@ -172,6 +186,9 @@ public final class Config {
     moduleConstants[2].driveConstants.kDriveMotorInverted = false;
     moduleConstants[2].driveConstants.kTurningMotorInverted = false;
     moduleConstants[2].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
+    moduleConstants[1].driveConstants.kLampreyChannel = 2;
+    moduleConstants[1].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
+            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 3")); 
 
     moduleConstants[2].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[2].driveCANPIDConstants.minPower = -1;
@@ -203,6 +220,9 @@ public final class Config {
     moduleConstants[3].driveConstants.kDriveMotorInverted = false;
     moduleConstants[3].driveConstants.kTurningMotorInverted = false;
     moduleConstants[3].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
+    moduleConstants[1].driveConstants.kLampreyChannel = 3;
+    moduleConstants[1].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
+            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 4")); 
 
     moduleConstants[3].driveCANPIDConstants = new CANPIDConstants();
     moduleConstants[3].driveCANPIDConstants.minPower = -1;
