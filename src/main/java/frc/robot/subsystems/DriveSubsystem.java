@@ -102,11 +102,11 @@ public class DriveSubsystem extends SubsystemBase {
     }
 
     /** Resets the drive encoders to currently read a position of 0. */
-    public void resetEncoders() {
-        m_frontLeft.resetEncoders();
-        m_rearLeft.resetEncoders();
-        m_rearRight.resetEncoders();
-        m_frontRight.resetEncoders();
+    public void updateTurningEncodersFromLamprey() {
+        m_frontLeft.updateTurningEncoderFromLamprey();
+        m_rearLeft.updateTurningEncoderFromLamprey();
+        m_rearRight.updateTurningEncoderFromLamprey();
+        m_frontRight.updateTurningEncoderFromLamprey();
     }
 
     /** Zeroes the heading of the robot. */

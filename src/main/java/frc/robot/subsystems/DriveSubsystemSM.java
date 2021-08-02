@@ -20,19 +20,22 @@ public class DriveSubsystemSM extends SubsystemBase {
     // Robot swerve modules
     private final SwerveModule m_singleModule = new SwerveModule(1);
 
-    private DriveSubsystemSM instance;
+    private static DriveSubsystemSM instance;
 
     /** Creates a new DriveSubsystem. */
     private DriveSubsystemSM() {
     }
 
-    public DriveSubsystemSM getInstance() {
+    public static DriveSubsystemSM getInstance() {
         if (instance == null) {
             instance = new DriveSubsystemSM();
         }
         return instance;
     }
 
+    public void updateTurningEncodersFromLamprey() {
+        m_singleModule.updateTurningEncoderFromLamprey();
+    }
 
     public void setModuleState(SwerveModuleState desiredState) {
         m_singleModule.setDesiredState(desiredState);
