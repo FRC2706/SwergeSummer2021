@@ -76,7 +76,7 @@ public class RobotContainer {
                 AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared)
             // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveConstants.kDriveKinematics);
+            .setKinematics(Config.kDriveKinematics);
 
     // An example trajectory to follow.  All units in meters.
     Trajectory exampleTrajectory =
@@ -98,7 +98,7 @@ public class RobotContainer {
         new SwerveControllerCommand(
             exampleTrajectory,
             m_robotDrive::getPose, // Functional interface to feed supplier
-            DriveConstants.kDriveKinematics,
+            Config.kDriveKinematics,
 
             // Position controllers
             new PIDController(AutoConstants.kPXController, 0, 0),

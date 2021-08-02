@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import javax.lang.model.util.ElementScanner6;
+
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
@@ -17,91 +19,70 @@ import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
  * constants are needed, to reduce verbosity.
  */
 public final class Config {
-  public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 0;
-    public static final int kRearLeftDriveMotorPort = 2;
-    public static final int kFrontRightDriveMotorPort = 4;
-    public static final int kRearRightDriveMotorPort = 6;
 
-    public static final int kFrontLeftTurningMotorPort = 1;
-    public static final int kRearLeftTurningMotorPort = 3;
-    public static final int kFrontRightTurningMotorPort = 5;
-    public static final int kRearRightTurningMotorPort = 7;
+  public class DriveConstants {
+    public int kDriveMotorChannel;
+    public int kTurningMotorChannel;
+   
+    public boolean kDriveMotorInverted; 
+    public boolean kTurningMotorInverted;
 
-    public static final int[] kFrontLeftTurningEncoderPorts = new int[] {0, 1};
-    public static final int[] kRearLeftTurningEncoderPorts = new int[] {2, 3};
-    public static final int[] kFrontRightTurningEncoderPorts = new int[] {4, 5};
-    public static final int[] kRearRightTurningEncoderPorts = new int[] {5, 6};
+    //Note: encoder does not have inversion for the Brushless Mode.
+    public Translation2d kTranslation2dKinematics;
+  }
 
-    public static final boolean kFrontLeftTurningEncoderReversed = false;
-    public static final boolean kRearLeftTurningEncoderReversed = true;
-    public static final boolean kFrontRightTurningEncoderReversed = false;
-    public static final boolean kRearRightTurningEncoderReversed = true;
+  public class CANPIDConstants {
+    public double minPower;
+    public double maxPower;
+    public double kFF;
+    public double kP;
+    public double kI;
+    public double kD;
+    public double kIZone;    
+  }
 
-    public static final int[] kFrontLeftDriveEncoderPorts = new int[] {7, 8};
-    public static final int[] kRearLeftDriveEncoderPorts = new int[] {9, 10};
-    public static final int[] kFrontRightDriveEncoderPorts = new int[] {11, 12};
-    public static final int[] kRearRightDriveEncoderPorts = new int[] {13, 14};
+  public class CANDEncoderConstants {
+    public static final int SECOND_PER_MINUTE = 60;
+    public double kWheelDiameterMeters;
+    public double kVelocityConversionFactor; //for gears
+    public double kPositionConversionFactor;
 
-    public static final boolean kFrontLeftDriveEncoderReversed = false;
-    public static final boolean kRearLeftDriveEncoderReversed = true;
-    public static final boolean kFrontRightDriveEncoderReversed = false;
-    public static final boolean kRearRightDriveEncoderReversed = true;
+  }
 
-    public static final double kTrackWidth = 0.5;
-    // Distance between centers of right and left wheels on robot
-    public static final double kWheelBase = 0.7;
-    // Distance between front and back wheels on robot
-    public static final SwerveDriveKinematics kDriveKinematics =
-        new SwerveDriveKinematics(
-            new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-            new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+  public class ModuleConstants {
+    //driveConstants
+    public DriveConstants driveConstants;
+    //drivePID
+    public CANPIDConstants driveCANPIDConstants;
+    //turningPID
+    public CANPIDConstants turnCANPIDConstants;
+    //encoders
+    public CANDEncoderConstants encoderConstants;
+  }
+  
+  // Distance between centers of right and left wheels on robot
+  public static final double kTrackWidth = 0.5;
+  // Distance between front and back wheels on robot
+  public static final double kWheelBase = 0.7;
+  public static final boolean kGyroReversed = false;
 
-    public static final boolean kGyroReversed = false;
+  public static ModuleConstants[] moduleConstants;
 
-    // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
-    // These characterization values MUST be determined either experimentally or theoretically
-    // for *your* robot's drive.
-    // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
-    // values for your robot.
+  // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
+  // These characterization values MUST be determined either experimentally or theoretically
+  // for *your* robot's drive.
+  // The RobotPy Characterization Toolsuite provides a convenient tool for obtaining these
+  // values for your robot.
+  public static final class AutoConstants {
     public static final double ksVolts = 1;
     public static final double kvVoltSecondsPerMeter = 0.8;
     public static final double kaVoltSecondsSquaredPerMeter = 0.15;
-
-    public static final double kMaxSpeedMetersPerSecond = 3;
-  }
-
-  public static final class ModuleConstants {
-    public static final double kMaxModuleAngularSpeedRadiansPerSecond = 2 * Math.PI;
-    public static final double kMaxModuleAngularAccelerationRadiansPerSecondSquared = 2 * Math.PI;
-
-    public static final int kEncoderCPR = 1024;
-    public static final double kWheelDiameterMeters = 0.15;
-    public static final double kDriveEncoderDistancePerPulse =
-        // Assumes the encoders are directly mounted on the wheel shafts
-        (kWheelDiameterMeters * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kTurningEncoderDistancePerPulse =
-        // Assumes the encoders are on a 1:1 reduction with the module shaft.
-        (2 * Math.PI) / (double) kEncoderCPR;
-
-    public static final double kPModuleTurningController = 1;
-
-    public static final double kPModuleDriveController = 1;
-  }
-
-  public static final class OIConstants {
-    public static final int kDriverControllerPort = 1;
-  }
-
-  public static final class AutoConstants {
     public static final double kMaxSpeedMetersPerSecond = 3;
     public static final double kMaxAccelerationMetersPerSecondSquared = 3;
     public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
     public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
 
+    //@todo: clean up
     public static final double kPXController = 1;
     public static final double kPYController = 1;
     public static final double kPThetaController = 1;
@@ -110,5 +91,165 @@ public final class Config {
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
         new TrapezoidProfile.Constraints(
             kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
+  }  
+
+  //@todo: clean up
+  public static final class OIConstants {
+    public static final int kDriverControllerPort = 1;
+    public static final int PIGEON_ID = 27;  //<-- TBD
   }
+  
+  public Config()
+  {
+    moduleConstants = new ModuleConstants[4];
+ 
+    //module Index 0 : /single module
+    moduleConstants[0].driveConstants = new DriveConstants();
+    moduleConstants[0].driveConstants.kDriveMotorChannel = 0;
+    moduleConstants[0].driveConstants.kTurningMotorChannel = 1;
+    moduleConstants[0].driveConstants.kDriveMotorInverted = false;
+    moduleConstants[0].driveConstants.kTurningMotorInverted = false;
+    moduleConstants[0].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, kTrackWidth / 2);
+
+    moduleConstants[0].driveCANPIDConstants = new CANPIDConstants();
+    moduleConstants[0].driveCANPIDConstants.minPower = -1;
+    moduleConstants[0].driveCANPIDConstants.maxPower = 1;
+    moduleConstants[0].driveCANPIDConstants.kFF = 1.;
+    moduleConstants[0].driveCANPIDConstants.kP = 1.;
+    moduleConstants[0].driveCANPIDConstants.kI = 0.;
+    moduleConstants[0].driveCANPIDConstants.kD = 0.;
+    moduleConstants[0].driveCANPIDConstants.kIZone = 0;
+
+    moduleConstants[0].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[0].turnCANPIDConstants.minPower = -1;
+    moduleConstants[0].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[0].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[0].turnCANPIDConstants.kP = 1.;
+    moduleConstants[0].turnCANPIDConstants.kI = 0.;
+    moduleConstants[0].turnCANPIDConstants.kD = 0.;
+    moduleConstants[0].turnCANPIDConstants.kIZone = 0;
+
+    moduleConstants[0].encoderConstants = new CANDEncoderConstants();
+    moduleConstants[0].encoderConstants.kWheelDiameterMeters = 0.15;
+    moduleConstants[0].encoderConstants.kVelocityConversionFactor = 1.;
+    moduleConstants[0].encoderConstants.kPositionConversionFactor = 1.;
+
+    //module Index 1: 
+    moduleConstants[1].driveConstants = new DriveConstants();
+    moduleConstants[1].driveConstants.kDriveMotorChannel = 0;
+    moduleConstants[1].driveConstants.kTurningMotorChannel = 1;
+    moduleConstants[1].driveConstants.kDriveMotorInverted = false;
+    moduleConstants[1].driveConstants.kTurningMotorInverted = false;
+    moduleConstants[1].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, -kTrackWidth / 2);
+
+    moduleConstants[1].driveCANPIDConstants = new CANPIDConstants();
+    moduleConstants[1].driveCANPIDConstants.minPower = -1;
+    moduleConstants[1].driveCANPIDConstants.maxPower = 1;
+    moduleConstants[1].driveCANPIDConstants.kFF = 1.;
+    moduleConstants[1].driveCANPIDConstants.kP = 1.;
+    moduleConstants[1].driveCANPIDConstants.kI = 0.;
+    moduleConstants[1].driveCANPIDConstants.kD = 0.;
+    moduleConstants[1].driveCANPIDConstants.kIZone = 0;
+
+    moduleConstants[1].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[1].turnCANPIDConstants.minPower = -1;
+    moduleConstants[1].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[1].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[1].turnCANPIDConstants.kP = 1.;
+    moduleConstants[1].turnCANPIDConstants.kI = 0.;
+    moduleConstants[1].turnCANPIDConstants.kD = 0.;
+    moduleConstants[1].turnCANPIDConstants.kIZone = 0;
+
+    moduleConstants[1].encoderConstants = new CANDEncoderConstants();
+    moduleConstants[1].encoderConstants.kWheelDiameterMeters = 0.15;
+    moduleConstants[1].encoderConstants.kVelocityConversionFactor = 1.;
+    moduleConstants[1].encoderConstants.kPositionConversionFactor = 1.;
+
+    //module Index 2: 
+    moduleConstants[2].driveConstants = new DriveConstants();
+    moduleConstants[2].driveConstants.kDriveMotorChannel = 0;
+    moduleConstants[2].driveConstants.kTurningMotorChannel = 1;
+    moduleConstants[2].driveConstants.kDriveMotorInverted = false;
+    moduleConstants[2].driveConstants.kTurningMotorInverted = false;
+    moduleConstants[2].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
+
+    moduleConstants[2].driveCANPIDConstants = new CANPIDConstants();
+    moduleConstants[2].driveCANPIDConstants.minPower = -1;
+    moduleConstants[2].driveCANPIDConstants.maxPower = 1;
+    moduleConstants[2].driveCANPIDConstants.kFF = 1.;
+    moduleConstants[2].driveCANPIDConstants.kP = 1.;
+    moduleConstants[2].driveCANPIDConstants.kI = 0.;
+    moduleConstants[2].driveCANPIDConstants.kD = 0.;
+    moduleConstants[2].driveCANPIDConstants.kIZone = 0;
+
+    moduleConstants[2].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[2].turnCANPIDConstants.minPower = -1;
+    moduleConstants[2].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[2].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[2].turnCANPIDConstants.kP = 1.;
+    moduleConstants[2].turnCANPIDConstants.kI = 0.;
+    moduleConstants[2].turnCANPIDConstants.kD = 0.;
+    moduleConstants[2].turnCANPIDConstants.kIZone = 0;
+
+    moduleConstants[2].encoderConstants = new CANDEncoderConstants();
+    moduleConstants[2].encoderConstants.kWheelDiameterMeters = 0.15;
+    moduleConstants[2].encoderConstants.kVelocityConversionFactor = 1.;
+    moduleConstants[2].encoderConstants.kPositionConversionFactor = 1.;
+
+    //module Index 3: 
+    moduleConstants[3].driveConstants = new DriveConstants();
+    moduleConstants[3].driveConstants.kDriveMotorChannel = 0;
+    moduleConstants[3].driveConstants.kTurningMotorChannel = 1;
+    moduleConstants[3].driveConstants.kDriveMotorInverted = false;
+    moduleConstants[3].driveConstants.kTurningMotorInverted = false;
+    moduleConstants[3].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
+
+    moduleConstants[3].driveCANPIDConstants = new CANPIDConstants();
+    moduleConstants[3].driveCANPIDConstants.minPower = -1;
+    moduleConstants[3].driveCANPIDConstants.maxPower = 1;
+    moduleConstants[3].driveCANPIDConstants.kFF = 1.;
+    moduleConstants[3].driveCANPIDConstants.kP = 1.;
+    moduleConstants[3].driveCANPIDConstants.kI = 0.;
+    moduleConstants[3].driveCANPIDConstants.kD = 0.;
+    moduleConstants[3].driveCANPIDConstants.kIZone = 0;
+
+    moduleConstants[3].turnCANPIDConstants = new CANPIDConstants();
+    moduleConstants[3].turnCANPIDConstants.minPower = -1;
+    moduleConstants[3].turnCANPIDConstants.maxPower = 1;
+    moduleConstants[3].turnCANPIDConstants.kFF = 1.;
+    moduleConstants[3].turnCANPIDConstants.kP = 1.;
+    moduleConstants[3].turnCANPIDConstants.kI = 0.;
+    moduleConstants[3].turnCANPIDConstants.kD = 0.;
+    moduleConstants[3].turnCANPIDConstants.kIZone = 0;
+
+    moduleConstants[3].encoderConstants = new CANDEncoderConstants();
+    moduleConstants[3].encoderConstants.kWheelDiameterMeters = 0.15;
+    moduleConstants[3].encoderConstants.kVelocityConversionFactor = 1.;
+    moduleConstants[3].encoderConstants.kPositionConversionFactor = 1.;
+  }
+
+  public static final SwerveDriveKinematics kDriveKinematics =
+        new SwerveDriveKinematics(  moduleConstants[0].driveConstants.kTranslation2dKinematics,
+                                    moduleConstants[1].driveConstants.kTranslation2dKinematics,
+                                    moduleConstants[2].driveConstants.kTranslation2dKinematics,
+                                    moduleConstants[3].driveConstants.kTranslation2dKinematics);
+  
+  //Valid module index is 1,2,3,4
+  //1 is top left
+  //2 is bottom left
+  //3 is bottom right
+  //4 is top right
+  public static ModuleConstants module(int modIndex)
+  {
+    if(modIndex >=1 && modIndex <=4)
+    {
+      return moduleConstants[modIndex-1];
+    }
+    else
+    {
+      System.out.println("Config module: Invalid module index");
+      return null;
+    }
+  }
+
 }
