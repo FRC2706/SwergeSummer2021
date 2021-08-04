@@ -203,10 +203,8 @@ public class SwerveModule {
         m_turningEncoder.setPosition(convertAngleToPos(lampreyRadians + offset));
     }
 
-    //only for the single module
-    public double getCurrentDriveDistance()
-    {
-        return (m_driveEncoder.getPosition() * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI));
-
+    public void stopMotors() {
+        m_driveMotor.stopMotor();
+        m_turningMotor.stopMotor();
     }
 }

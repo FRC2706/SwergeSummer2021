@@ -40,4 +40,8 @@ public class DriveSubsystemSM extends SubsystemBase {
     public void setModuleState(SwerveModuleState desiredState) {
         m_singleModule.setDesiredState(desiredState);
     }
+
+    public void stopMotors() {
+        m_singleModule.stopMotors();
+    }
 }

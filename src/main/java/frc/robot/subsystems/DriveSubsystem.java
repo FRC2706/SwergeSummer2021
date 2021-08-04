@@ -109,6 +109,12 @@ public class DriveSubsystem extends SubsystemBase {
         m_frontRight.updateTurningEncoderFromLamprey();
     }
 
+    public void stopMotors() {
+        m_frontLeft.stopMotors();
+        m_rearLeft.stopMotors();
+        m_rearRight.stopMotors();
+        m_frontRight.stopMotors();
+    }
     /** Zeroes the heading of the robot. */
     public void zeroHeading() {
         m_gyro.reset();
