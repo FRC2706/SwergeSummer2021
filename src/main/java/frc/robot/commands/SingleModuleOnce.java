@@ -8,13 +8,15 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 
 public class SingleModuleOnce extends CommandBase {
     /** Creates a new SingleModuleOnce. */
-    public SingleModuleOnce() {
+    public SingleModuleOnce(double wheelVelocity, Rotation2d steeringAngle) {
         // Use addRequirements() here to declare subsystem dependencies.
+        var moduleState = new SwerveModuleState(wheelVelocity, streeringAngle);
     }
 
     // Called when the command is initially scheduled.
     @Override
     public void initialize() {
+        DriveSubsystemSM.getInstance().setModuleState(moduleState);
     }
 
     // Called every time the scheduler runs while the command is scheduled.

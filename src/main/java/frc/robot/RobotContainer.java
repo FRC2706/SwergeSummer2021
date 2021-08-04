@@ -32,14 +32,14 @@ import frc.robot.comamands.SingleModuleOnce;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+    // The robot's subsystems
+    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+    // The driver's controller
+    XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);  
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
@@ -67,10 +67,10 @@ public class RobotContainer {
       Joystick joyStick1 = new Joystick(1);
 
       //Instantiate the command and bind it
-      Command singleModuleOnce0 = new SingleModuleOnce(0.3, 45);
+      Command singleModuleOnce0 = new SingleModuleOnce(0.3, 45.0);
       new JoystickButton(joyStick1, XboxController.Button.kBumberLeft.value).whenHeld(singleModuleOnce0);
 
-      Command singleModuleOnce1 = new SingleModuleOnce(2.0, 315);  
+      Command singleModuleOnce1 = new SingleModuleOnce(2.0, 315.0);  
       new JoystickButton(joystick1, XboxController.Button.KBumberRight.value).whenHeld(singleModuleOnce1);
   }
 
