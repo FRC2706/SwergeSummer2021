@@ -106,8 +106,8 @@ public final class Config {
 
       encoderConstants = new CANDEncoderConstants();
       encoderConstants.kWheelDiameterMeters = 0.1016; // 4in wheels
-      encoderConstants.kVelocityConversionFactor = 1.;
-      encoderConstants.kPositionConversionFactor = 1.;
+      encoderConstants.kVelocityConversionFactor = 1.0/7.615; // Wheel spins once = encoder spins 7.615 times
+      encoderConstants.kPositionConversionFactor = 1.0/8; // Wheel spins once = encoder spins 8 times
     }
 
     /**
