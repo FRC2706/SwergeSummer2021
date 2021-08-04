@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -23,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
-import frc.robot.comamands.SingleModuleOnce;
+import frc.robot.commands.SingleModuleOnce;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -65,13 +66,13 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
       Joystick joyStick1 = new Joystick(1);
-
+    
       //Instantiate the command and bind it
-      Command singleModuleOnce0 = new SingleModuleOnce(0.3, 45.0);
-      new JoystickButton(joyStick1, XboxController.Button.kBumberLeft.value).whenHeld(singleModuleOnce0);
+      Command singleModuleOnce0 = new SingleModuleOnce(0.3, Rotation2d.fromDegrees(45));
+      new JoystickButton(joyStick1, XboxController.Button.kBumperLeft.value).whenHeld(singleModuleOnce0);
 
-      Command singleModuleOnce1 = new SingleModuleOnce(2.0, 315.0);  
-      new JoystickButton(joystick1, XboxController.Button.KBumberRight.value).whenHeld(singleModuleOnce1);
+      Command singleModuleOnce1 = new SingleModuleOnce(2.0, Rotation2d.fromDegrees(315));  
+      new JoystickButton(joyStick1, XboxController.Button.kBumperRight.value).whenHeld(singleModuleOnce1);
   }
 
 
