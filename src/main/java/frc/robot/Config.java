@@ -81,8 +81,10 @@ public final class Config {
                                         new Translation2d(kWheelBase / 2, -kTrackWidth / 2));
 
       driveConstants.kLampreyChannel = moduleSpecific(0, 1, 2, 3); // 0-3 analog ports on roborio
+
       String tableName = "Swerve Chassis/SwerveModule " + m_moduleIndex;
-      driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
+      double lampreyOffset = moduleSpecific(0.0, 0.0, 0.0, 0.0);
+      driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", lampreyOffset, true)
             .registerToTable(NetworkTableInstance.getDefault().getTable(tableName)); 
 
 
