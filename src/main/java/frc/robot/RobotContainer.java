@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
@@ -23,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+import frc.robot.commands.SingleModuleOnce;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -31,14 +33,14 @@ import java.util.List;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems
-  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+    // The robot's subsystems
+    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-  // The driver's controller
-  XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+    // The driver's controller
+    XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);  
 
-  /** The container for the robot. Contains subsystems, OI devices, and commands. */
-  public RobotContainer() {
+    /** The container for the robot. Contains subsystems, OI devices, and commands. */
+    public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
 
@@ -62,7 +64,17 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then calling passing it to a
    * {@link JoystickButton}.
    */
-  private void configureButtonBindings() {}
+  private void configureButtonBindings() {
+      Joystick joyStick1 = new Joystick(1);
+    
+      //Instantiate the command and bind it
+      Command singleModuleOnce0 = new SingleModuleOnce(0.3, Rotation2d.fromDegrees(45));
+      new JoystickButton(joyStick1, XboxController.Button.kBumperLeft.value).whenHeld(singleModuleOnce0);
+
+      Command singleModuleOnce1 = new SingleModuleOnce(2.0, Rotation2d.fromDegrees(315));  
+      new JoystickButton(joyStick1, XboxController.Button.kBumperRight.value).whenHeld(singleModuleOnce1);
+  }
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.

@@ -4,12 +4,20 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.DriveSubsystemSM;
 
 public class SingleModuleOnce extends CommandBase {
     /** Creates a new SingleModuleOnce. */
-    public SingleModuleOnce() {
+
+    SwerveModuleState m_moduleState;    
+
+    public SingleModuleOnce(double wheelVelocity, Rotation2d steeringAngle) {
         // Use addRequirements() here to declare subsystem dependencies.
+        m_moduleState = new SwerveModuleState(wheelVelocity, steeringAngle);
+        addRequirements(DriveSubsystemSM.getInstance());
     }
 
     // Called when the command is initially scheduled.
@@ -20,16 +28,18 @@ public class SingleModuleOnce extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
+        DriveSubsystemSM.getInstance().setModuleState(m_moduleState);
     }
 
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        DriveSubsystemSM.getInstance().stopMotors();
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        return false;
+        return true;
     }
 }
