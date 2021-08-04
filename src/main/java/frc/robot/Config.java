@@ -63,11 +63,77 @@ public final class Config {
     public CANPIDConstants turnCANPIDConstants;
     //encoders
     public CANDEncoderConstants encoderConstants;
+
+    private int m_moduleIndex;
+
+    public ModuleConstants(int moduleIndex) {
+      m_moduleIndex = moduleIndex;
+
+      driveConstants = new DriveConstants();
+      driveConstants.kDriveMotorChannel = moduleSpecific(1, 3, 5, 7);
+      driveConstants.kTurningMotorChannel = moduleSpecific(2, 4, 6, 8);
+      driveConstants.kDriveMotorInverted = false; // All motors should spin in same direction if wired the same. Positive as counter-clockwise.
+      driveConstants.kTurningMotorInverted = false; // If a motor doesn't spin the right way, swap 2 of the 3 wires going to the brushless motor.
+      driveConstants.kTranslation2dKinematics = moduleSpecific(
+                                        new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+                                        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+                                        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2),
+                                        new Translation2d(kWheelBase / 2, -kTrackWidth / 2));
+
+      driveConstants.kLampreyChannel = moduleSpecific(0, 1, 2, 3); // 0-3 analog ports on roborio
+
+      String tableName = "Swerve Chassis/SwerveModule " + m_moduleIndex;
+      double lampreyOffset = moduleSpecific(0.0, 0.0, 0.0, 0.0);
+      driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", lampreyOffset, true)
+            .registerToTable(NetworkTableInstance.getDefault().getTable(tableName)); 
+
+
+      driveCANPIDConstants = new CANPIDConstants();
+      driveCANPIDConstants.minPower = -1;
+      driveCANPIDConstants.maxPower = 1;
+      driveCANPIDConstants.kFF = 0; // These can also be module specific.
+      driveCANPIDConstants.kP = 0;  // Hopefully they won't need to be.
+      driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
+      driveCANPIDConstants.kD = 0.;
+      driveCANPIDConstants.kIZone = 0;
+
+      turnCANPIDConstants = new CANPIDConstants();
+      turnCANPIDConstants.minPower = -1;
+      turnCANPIDConstants.maxPower = 1;
+      turnCANPIDConstants.kFF = 1.;
+      turnCANPIDConstants.kP = 0;
+      turnCANPIDConstants.kI = 0.;
+      turnCANPIDConstants.kD = 0.;
+      turnCANPIDConstants.kIZone = 0;
+
+      encoderConstants = new CANDEncoderConstants();
+      encoderConstants.kWheelDiameterMeters = 0.1016; // 4in wheels
+      encoderConstants.kVelocityConversionFactor = 1.0/7.615; // Wheel spins once = encoder spins 7.615 times
+      encoderConstants.kPositionConversionFactor = 1.0/8; // Wheel spins once = encoder spins 8 times
+    }
+
+    /**
+     * Returns one of the values passed based on the robot ID
+     *
+     * @param first The first value (default value)
+     * @param more  Other values that could be selected
+     * @param <T>   The type of the value
+     * @return The value selected based on the ID of the robot
+     */
+    @SafeVarargs
+    private <T> T moduleSpecific(T first, T... more) {
+        int index = m_moduleIndex-1;
+        if (index < 1 || index > more.length) {
+            return first;
+        } else {
+            return more[index - 1];
+        }
+    }
   }
   
-  // Distance between centers of right and left wheels on robot
+  // Distance between centers of right and left wheels on robot (y direction)
   public static final double kTrackWidth = 0.5;
-  // Distance between front and back wheels on robot
+  // Distance between front and back wheels on robot (x direction)
   public static final double kWheelBase = 0.7;
   public static final boolean kGyroReversed = false;
 
@@ -109,143 +175,15 @@ public final class Config {
   public Config()
   {
     moduleConstants = new ModuleConstants[4];
- 
-    //module Index 0 : /single module
-    moduleConstants[0].driveConstants = new DriveConstants();
-    moduleConstants[0].driveConstants.kDriveMotorChannel = 0;
-    moduleConstants[0].driveConstants.kTurningMotorChannel = 1;
-    moduleConstants[0].driveConstants.kDriveMotorInverted = false;
-    moduleConstants[0].driveConstants.kTurningMotorInverted = false;
-    moduleConstants[0].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, kTrackWidth / 2);
-    moduleConstants[0].driveConstants.kLampreyChannel = 0;
-    moduleConstants[0].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
-            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 1")); 
 
-
-    moduleConstants[0].driveCANPIDConstants = new CANPIDConstants();
-    moduleConstants[0].driveCANPIDConstants.minPower = -1;
-    moduleConstants[0].driveCANPIDConstants.maxPower = 1;
-    moduleConstants[0].driveCANPIDConstants.kFF = 1.;
-    moduleConstants[0].driveCANPIDConstants.kP = 1.;
-    moduleConstants[0].driveCANPIDConstants.kI = 0.;
-    moduleConstants[0].driveCANPIDConstants.kD = 0.;
-    moduleConstants[0].driveCANPIDConstants.kIZone = 0;
-
-    moduleConstants[0].turnCANPIDConstants = new CANPIDConstants();
-    moduleConstants[0].turnCANPIDConstants.minPower = -1;
-    moduleConstants[0].turnCANPIDConstants.maxPower = 1;
-    moduleConstants[0].turnCANPIDConstants.kFF = 1.;
-    moduleConstants[0].turnCANPIDConstants.kP = 1.;
-    moduleConstants[0].turnCANPIDConstants.kI = 0.;
-    moduleConstants[0].turnCANPIDConstants.kD = 0.;
-    moduleConstants[0].turnCANPIDConstants.kIZone = 0;
-
-    moduleConstants[0].encoderConstants = new CANDEncoderConstants();
-    moduleConstants[0].encoderConstants.kWheelDiameterMeters = 0.15;
-    moduleConstants[0].encoderConstants.kVelocityConversionFactor = 1.;
-    moduleConstants[0].encoderConstants.kPositionConversionFactor = 1.;
-
-    //module Index 1: 
-    moduleConstants[1].driveConstants = new DriveConstants();
-    moduleConstants[1].driveConstants.kDriveMotorChannel = 0;
-    moduleConstants[1].driveConstants.kTurningMotorChannel = 1;
-    moduleConstants[1].driveConstants.kDriveMotorInverted = false;
-    moduleConstants[1].driveConstants.kTurningMotorInverted = false;
-    moduleConstants[1].driveConstants.kTranslation2dKinematics = new Translation2d(kWheelBase / 2, -kTrackWidth / 2);
-    moduleConstants[1].driveConstants.kLampreyChannel = 1;
-    moduleConstants[1].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
-            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 2")); 
-
-    moduleConstants[1].driveCANPIDConstants = new CANPIDConstants();
-    moduleConstants[1].driveCANPIDConstants.minPower = -1;
-    moduleConstants[1].driveCANPIDConstants.maxPower = 1;
-    moduleConstants[1].driveCANPIDConstants.kFF = 1.;
-    moduleConstants[1].driveCANPIDConstants.kP = 1.;
-    moduleConstants[1].driveCANPIDConstants.kI = 0.;
-    moduleConstants[1].driveCANPIDConstants.kD = 0.;
-    moduleConstants[1].driveCANPIDConstants.kIZone = 0;
-
-    moduleConstants[1].turnCANPIDConstants = new CANPIDConstants();
-    moduleConstants[1].turnCANPIDConstants.minPower = -1;
-    moduleConstants[1].turnCANPIDConstants.maxPower = 1;
-    moduleConstants[1].turnCANPIDConstants.kFF = 1.;
-    moduleConstants[1].turnCANPIDConstants.kP = 1.;
-    moduleConstants[1].turnCANPIDConstants.kI = 0.;
-    moduleConstants[1].turnCANPIDConstants.kD = 0.;
-    moduleConstants[1].turnCANPIDConstants.kIZone = 0;
-
-    moduleConstants[1].encoderConstants = new CANDEncoderConstants();
-    moduleConstants[1].encoderConstants.kWheelDiameterMeters = 0.15;
-    moduleConstants[1].encoderConstants.kVelocityConversionFactor = 1.;
-    moduleConstants[1].encoderConstants.kPositionConversionFactor = 1.;
-
-    //module Index 2: 
-    moduleConstants[2].driveConstants = new DriveConstants();
-    moduleConstants[2].driveConstants.kDriveMotorChannel = 0;
-    moduleConstants[2].driveConstants.kTurningMotorChannel = 1;
-    moduleConstants[2].driveConstants.kDriveMotorInverted = false;
-    moduleConstants[2].driveConstants.kTurningMotorInverted = false;
-    moduleConstants[2].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, kTrackWidth / 2);
-    moduleConstants[1].driveConstants.kLampreyChannel = 2;
-    moduleConstants[1].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
-            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 3")); 
-
-    moduleConstants[2].driveCANPIDConstants = new CANPIDConstants();
-    moduleConstants[2].driveCANPIDConstants.minPower = -1;
-    moduleConstants[2].driveCANPIDConstants.maxPower = 1;
-    moduleConstants[2].driveCANPIDConstants.kFF = 1.;
-    moduleConstants[2].driveCANPIDConstants.kP = 1.;
-    moduleConstants[2].driveCANPIDConstants.kI = 0.;
-    moduleConstants[2].driveCANPIDConstants.kD = 0.;
-    moduleConstants[2].driveCANPIDConstants.kIZone = 0;
-
-    moduleConstants[2].turnCANPIDConstants = new CANPIDConstants();
-    moduleConstants[2].turnCANPIDConstants.minPower = -1;
-    moduleConstants[2].turnCANPIDConstants.maxPower = 1;
-    moduleConstants[2].turnCANPIDConstants.kFF = 1.;
-    moduleConstants[2].turnCANPIDConstants.kP = 1.;
-    moduleConstants[2].turnCANPIDConstants.kI = 0.;
-    moduleConstants[2].turnCANPIDConstants.kD = 0.;
-    moduleConstants[2].turnCANPIDConstants.kIZone = 0;
-
-    moduleConstants[2].encoderConstants = new CANDEncoderConstants();
-    moduleConstants[2].encoderConstants.kWheelDiameterMeters = 0.15;
-    moduleConstants[2].encoderConstants.kVelocityConversionFactor = 1.;
-    moduleConstants[2].encoderConstants.kPositionConversionFactor = 1.;
-
-    //module Index 3: 
-    moduleConstants[3].driveConstants = new DriveConstants();
-    moduleConstants[3].driveConstants.kDriveMotorChannel = 0;
-    moduleConstants[3].driveConstants.kTurningMotorChannel = 1;
-    moduleConstants[3].driveConstants.kDriveMotorInverted = false;
-    moduleConstants[3].driveConstants.kTurningMotorInverted = false;
-    moduleConstants[3].driveConstants.kTranslation2dKinematics = new Translation2d(-kWheelBase / 2, -kTrackWidth / 2);
-    moduleConstants[1].driveConstants.kLampreyChannel = 3;
-    moduleConstants[1].driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", 0.0, true)
-            .registerToTable(NetworkTableInstance.getDefault().getTable("Swerve Chassis/SwerveModule 4")); 
-
-    moduleConstants[3].driveCANPIDConstants = new CANPIDConstants();
-    moduleConstants[3].driveCANPIDConstants.minPower = -1;
-    moduleConstants[3].driveCANPIDConstants.maxPower = 1;
-    moduleConstants[3].driveCANPIDConstants.kFF = 1.;
-    moduleConstants[3].driveCANPIDConstants.kP = 1.;
-    moduleConstants[3].driveCANPIDConstants.kI = 0.;
-    moduleConstants[3].driveCANPIDConstants.kD = 0.;
-    moduleConstants[3].driveCANPIDConstants.kIZone = 0;
-
-    moduleConstants[3].turnCANPIDConstants = new CANPIDConstants();
-    moduleConstants[3].turnCANPIDConstants.minPower = -1;
-    moduleConstants[3].turnCANPIDConstants.maxPower = 1;
-    moduleConstants[3].turnCANPIDConstants.kFF = 1.;
-    moduleConstants[3].turnCANPIDConstants.kP = 1.;
-    moduleConstants[3].turnCANPIDConstants.kI = 0.;
-    moduleConstants[3].turnCANPIDConstants.kD = 0.;
-    moduleConstants[3].turnCANPIDConstants.kIZone = 0;
-
-    moduleConstants[3].encoderConstants = new CANDEncoderConstants();
-    moduleConstants[3].encoderConstants.kWheelDiameterMeters = 0.15;
-    moduleConstants[3].encoderConstants.kVelocityConversionFactor = 1.;
-    moduleConstants[3].encoderConstants.kPositionConversionFactor = 1.;
+    //1 is top left/single module
+    //2 is bottom left
+    //3 is bottom right
+    //4 is top right
+    moduleConstants[0] = new ModuleConstants(1);
+    moduleConstants[1] = new ModuleConstants(2);
+    moduleConstants[2] = new ModuleConstants(3);
+    moduleConstants[3] = new ModuleConstants(4);
   }
 
   public static final SwerveDriveKinematics kDriveKinematics =
