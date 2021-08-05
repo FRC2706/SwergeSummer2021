@@ -105,6 +105,7 @@ public class FluidConstant<T> implements Supplier<T> {
         // Only allow the value to be updated while the robot is disabled unless runWhileEnabled is true
         if (DriverStation.getInstance().isDisabled() || m_runWhileEnabled) {
             // This is a safe cast because NetworkTables already prevents assigning different types to NTEntries
+            @SuppressWarnings("unchecked")
             T newValue = (T) notification.value.getValue();
             this.setValue(newValue);
         } else {

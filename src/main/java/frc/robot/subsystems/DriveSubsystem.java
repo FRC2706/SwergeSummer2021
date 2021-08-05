@@ -36,8 +36,18 @@ public class DriveSubsystem extends SubsystemBase {
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Config.kDriveKinematics, m_gyro.getRotation2d());
 
+    // Singleton instance of the DriveSubsytem class
+    private static DriveSubsystem instance;
+
     /** Creates a new DriveSubsystem. */
-    public DriveSubsystem() {
+    private DriveSubsystem() {
+    }
+
+    public static DriveSubsystem getInstance() {
+        if (instance == null) {
+            instance = new DriveSubsystem();
+        }
+        return instance;
     }
 
     @Override
