@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import frc.robot.Config.DriveConstants;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
@@ -14,7 +13,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-import frc.robot.Config;
+import frc.robot.config.Config;
 
 @SuppressWarnings("PMD.ExcessiveImports")
 public class DriveSubsystem extends SubsystemBase {
@@ -37,8 +36,18 @@ public class DriveSubsystem extends SubsystemBase {
     // Odometry class for tracking robot pose
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Config.kDriveKinematics, m_gyro.getRotation2d());
 
+    // Singleton instance of the DriveSubsytem class
+    private static DriveSubsystem instance;
+
     /** Creates a new DriveSubsystem. */
-    public DriveSubsystem() {
+    private DriveSubsystem() {
+    }
+
+    public static DriveSubsystem getInstance() {
+        if (instance == null) {
+            instance = new DriveSubsystem();
+        }
+        return instance;
     }
 
     @Override
@@ -109,6 +118,12 @@ public class DriveSubsystem extends SubsystemBase {
         m_frontRight.updateTurningEncoderFromLamprey();
     }
 
+    public void stopMotors() {
+        m_frontLeft.stopMotors();
+        m_rearLeft.stopMotors();
+        m_rearRight.stopMotors();
+        m_frontRight.stopMotors();
+    }
     /** Zeroes the heading of the robot. */
     public void zeroHeading() {
         m_gyro.reset();

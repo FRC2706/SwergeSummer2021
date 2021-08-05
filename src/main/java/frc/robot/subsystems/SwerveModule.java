@@ -12,13 +12,10 @@ import com.revrobotics.ControlType;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
-import frc.robot.Config;
+import frc.robot.config.Config;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -37,9 +34,6 @@ public class SwerveModule {
     private CANPIDController m_turningPIDController;
   
     private AnalogPotentiometer m_lamprey;
-
-    private int m_driveEncoderCPR;
-    private int m_turningEncoderCPR;
 
     private NetworkTable      swerveModuleTable;
     private NetworkTableEntry desiredSpeedEntry ;
@@ -79,7 +73,6 @@ public class SwerveModule {
         m_drivePIDController.setIZone(Config.module(moduleIndex).driveCANPIDConstants.kIZone);
 
         m_driveEncoder = m_driveMotor.getEncoder();
-        m_driveEncoderCPR = m_driveEncoder.getCountsPerRevolution();
         m_driveEncoder.setVelocityConversionFactor(Config.module(moduleIndex).encoderConstants.kVelocityConversionFactor);
 
         //turning motor controller
@@ -98,7 +91,6 @@ public class SwerveModule {
         m_turningPIDController.setIZone(Config.module(moduleIndex).turnCANPIDConstants.kIZone);
 
         m_turningEncoder = m_turningMotor.getEncoder();
-        m_turningEncoderCPR = m_turningEncoder.getCountsPerRevolution();
         m_turningEncoder.setPositionConversionFactor(Config.module(moduleIndex).encoderConstants.kPositionConversionFactor );
 
         // Lamprey encoder
@@ -203,10 +195,8 @@ public class SwerveModule {
         m_turningEncoder.setPosition(convertAngleToPos(lampreyRadians + offset));
     }
 
-    //only for the single module
-    public double getCurrentDriveDistance()
-    {
-        return (m_driveEncoder.getPosition() * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI));
-
+    public void stopMotors() {
+        m_driveMotor.stopMotor();
+        m_turningMotor.stopMotor();
     }
 }
