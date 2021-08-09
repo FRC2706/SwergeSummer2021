@@ -61,13 +61,14 @@ public class RobotContainer {
 
         // Drive command, A split-stick arcade command, with forward/backward controlled
         //      by the left hand, and turning controlled by the right.
-        /** NOT FOR SINGLE MODULE
+        // NOT FOR SINGLE MODULE
+        /*
         Command driveCommand = new RunCommand(() -> DriveSubsystem.getInstance().drive(
             driverStick.getY(GenericHID.Hand.kLeft),
             driverStick.getX(GenericHID.Hand.kRight), 
             driverStick.getX(GenericHID.Hand.kLeft), false));
         DriveSubsystem.getInstance().setDefaultCommand(driveCommand); 
-        */ 
+        */
 
         // Instantiate the command and bind it
         Command singleModuleOnce0 = new SingleModuleOnce(0, Rotation2d.fromDegrees(0));
@@ -87,10 +88,11 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() { 
         return new InstantCommand(DriveSubsystemSM.getInstance()::stopMotors);
-        
-        /** NOT FOR SINGLE MODULE
+
+         //NOT FOR SINGLE MODULE
 
         // Create config for trajectory
+        /*
         TrajectoryConfig config = new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
                 AutoConstants.kMaxAccelerationMetersPerSecondSquared)
                         // Add kinematics to ensure max speed is actually obeyed
@@ -104,27 +106,29 @@ public class RobotContainer {
                 List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
                 // End 3 meters straight ahead of where we started, facing forward
                 new Pose2d(3, 0, new Rotation2d(0)), config);
-
+                */
+/*
         var thetaController = new ProfiledPIDController(AutoConstants.kPThetaController, 0, 0,
                 AutoConstants.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
         SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(exampleTrajectory,
-                m_robotDrive::getPose, // Functional interface to feed supplier
+                DriveSubsystem.getInstance()::getPose, // Functional interface to feed supplier
                 Config.kDriveKinematics,
 
                 // Position controllers
-                new PIDController(AutoConstants.kPXController, 0, 0),
-                new PIDController(AutoConstants.kPYController, 0, 0), thetaController, m_robotDrive::setModuleStates,
-                m_robotDrive);
+        //        new PIDController(AutoConstants.kPXController, 0, 0),
+        //        new PIDController(AutoConstants.kPYController, 0, 0), thetaController, DriveSubsystem.getInstance()::setModuleStates,
+          //      DriveSubsystem.getInstance());
 
         // Reset odometry to the starting pose of the trajectory.
-        m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
+        //DriveSubsystem.getInstance().resetOdometry(exampleTrajectory.getInitialPose());
 
         // Run path following command, then stop at the end.
-        return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false));
-
-
         */
+        //return swerveControllerCommand.andThen(() -> DriveSubsystem.getInstance().drive(0, 0, 0, false));
+
+
+        
     }
 }
