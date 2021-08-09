@@ -69,8 +69,10 @@ public final class Config {
             m_moduleIndex = moduleIndex;
 
             driveConstants = new DriveConstants();
-            driveConstants.kDriveMotorChannel = moduleSpecific(1, 3, 5, 7);
-            driveConstants.kTurningMotorChannel = moduleSpecific(2, 4, 6, 8);
+            driveConstants.kDriveMotorChannel = moduleSpecific(5, 3, 5, 7);
+            driveConstants.kTurningMotorChannel = moduleSpecific(6, 4, 6, 8);
+            //driveConstants.kDriveMotorChannel = moduleSpecific(6, 3, 5, 7);
+            //driveConstants.kTurningMotorChannel = moduleSpecific(5, 4, 6, 8);
             driveConstants.kDriveMotorInverted = false; // All motors should spin in same direction if wired the same.
                                                         // Positive as counter-clockwise.
             driveConstants.kTurningMotorInverted = false; // If a motor doesn't spin the right way, swap 2 of the 3
@@ -90,20 +92,26 @@ public final class Config {
             driveCANPIDConstants = new CANPIDConstants();
             driveCANPIDConstants.minPower = -1;
             driveCANPIDConstants.maxPower = 1;
-            driveCANPIDConstants.kFF = 0; // These can also be module specific.
-            driveCANPIDConstants.kP = 0; // Hopefully they won't need to be.
-            driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
-            driveCANPIDConstants.kD = 0.;
+            //driveCANPIDConstants.kFF = 0.00027; // These can also be module specific.
+            //driveCANPIDConstants.kP = 0.002; // Hopefully they won't need to be.
+            //driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
+            //driveCANPIDConstants.kD = 0.0002;
             driveCANPIDConstants.kIZone = 0;
+            driveCANPIDConstants.kFF = 0.00015; // These can also be module specific.
+            driveCANPIDConstants.kP = 0.00015; // Hopefully they won't need to be.
+            driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
+            driveCANPIDConstants.kD = 0.02;
 
             turnCANPIDConstants = new CANPIDConstants();
             turnCANPIDConstants.minPower = -1;
             turnCANPIDConstants.maxPower = 1;
-            turnCANPIDConstants.kFF = 1.;
-            turnCANPIDConstants.kP = 0;
-            turnCANPIDConstants.kI = 0.;
-            turnCANPIDConstants.kD = 0.;
-            turnCANPIDConstants.kIZone = 0;
+            turnCANPIDConstants.kFF = 0;
+            turnCANPIDConstants.kP = 1;
+            //turnCANPIDConstants.kI = 0.0003;
+            //turnCANPIDConstants.kD = 0.0005;
+            turnCANPIDConstants.kI = 0.0;
+            turnCANPIDConstants.kD = 0.0;
+            turnCANPIDConstants.kIZone = 0; //5 degrees
 
             encoderConstants = new CANDEncoderConstants();
             encoderConstants.kWheelDiameterMeters = 0.1016; // 4in wheels
@@ -172,6 +180,8 @@ public final class Config {
         public static final int PIGEON_ID = 27; // <-- TBD
     }
 
+    public static SwerveDriveKinematics kDriveKinematics;
+
     public Config() {
         moduleConstants = new ModuleConstants[4];
 
@@ -183,13 +193,14 @@ public final class Config {
         moduleConstants[1] = new ModuleConstants(2);
         moduleConstants[2] = new ModuleConstants(3);
         moduleConstants[3] = new ModuleConstants(4);
-    }
 
-    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+        SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
             moduleConstants[0].driveConstants.kTranslation2dKinematics,
             moduleConstants[1].driveConstants.kTranslation2dKinematics,
             moduleConstants[2].driveConstants.kTranslation2dKinematics,
             moduleConstants[3].driveConstants.kTranslation2dKinematics);
+    }
+
 
     // Valid module index is 1,2,3,4
     // 1 is top left
