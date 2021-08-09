@@ -36,4 +36,10 @@ public class DriveSubsystemSM extends SubsystemBase {
     public void stopMotors() {
         m_singleModule.stopMotors();
     }
+
+    @Override
+    public void periodic()
+    {
+        m_singleModule.updateLamprey();
+    }
 }
