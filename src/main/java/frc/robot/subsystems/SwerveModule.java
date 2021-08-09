@@ -16,7 +16,7 @@ import frc.robot.config.Config;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
-
+import edu.wpi.first.wpiutil.math.MathUtil;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -177,12 +177,15 @@ public class SwerveModule {
 
     public void updateNetworkTable( double desiredSpeed, double desiredAngle )
     {
+        Rotation2d currentAngle = getModuleCurrentAngle();
+        double currentSpeed = getModuleCurrentSpeedMetersPerSecond();
+
         desiredSpeedEntry.setDouble(desiredSpeed);
         desiredAngleEntry.setDouble(desiredAngle);
-        currentSpeedEntry.setDouble(getModuleCurrentSpeedMetersPerSecond());
-        currentAngleEntry.setDouble(getModuleCurrentAngle().getRadians());
-        speedError.setDouble(desiredSpeed - getModuleCurrentSpeedMetersPerSecond());
-        angleError.setDouble(desiredAngle - getModuleCurrentAngle().getRadians());
+        currentSpeedEntry.setDouble(currentSpeed);
+        currentAngleEntry.setDouble(MathUtil.angleModulus(currentAngle.getRadians()));
+        speedError.setDouble(desiredSpeed - currentSpeed);
+        angleError.setDouble(ContinousPIDSparkMax.shortestError(new Rotation2d(desiredAngle), currentAngle).getRadians());
 
     }
 
