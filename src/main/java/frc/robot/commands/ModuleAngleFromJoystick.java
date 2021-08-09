@@ -36,11 +36,11 @@ public class ModuleAngleFromJoystick extends CommandBase {
         double y = -yAxis.get();
         
         if (Math.abs(x) < 0.6 && Math.abs(y) < 0.6) {
-            // Do nothing
+            DriveSubsystemSM.getInstance().stopMotors();
         } else {
             Rotation2d angle = new Rotation2d(x, y);
 
-            SwerveModuleState state = new SwerveModuleState(0, angle);
+            SwerveModuleState state = new SwerveModuleState(0.5, angle);
 
             DriveSubsystemSM.getInstance().setModuleState(state);
         }
