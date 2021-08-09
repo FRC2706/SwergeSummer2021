@@ -88,7 +88,9 @@ public final class Config {
             double lampreyOffset = moduleSpecific(0.0, 0.0, 0.0, 0.0);
             driveConstants.kLampreyOffset = new FluidConstant<>("Lamprey Offset Radians", lampreyOffset, true)
                     .registerToTable(NetworkTableInstance.getDefault().getTable(tableName));
+            
 
+            //For drive
             driveCANPIDConstants = new CANPIDConstants();
             driveCANPIDConstants.minPower = -1;
             driveCANPIDConstants.maxPower = 1;
@@ -97,21 +99,22 @@ public final class Config {
             //driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
             //driveCANPIDConstants.kD = 0.0002;
             driveCANPIDConstants.kIZone = 0;
-            driveCANPIDConstants.kFF = 0.00015; // These can also be module specific.
-            driveCANPIDConstants.kP = 0.00015; // Hopefully they won't need to be.
+            driveCANPIDConstants.kFF = 0.0013; // These can also be module specific.
+            driveCANPIDConstants.kP = 0.000077; // Hopefully they won't need to be.
             driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
-            driveCANPIDConstants.kD = 0.02;
+            driveCANPIDConstants.kD = 0;
 
+            //For rotation
             turnCANPIDConstants = new CANPIDConstants();
             turnCANPIDConstants.minPower = -1;
             turnCANPIDConstants.maxPower = 1;
             turnCANPIDConstants.kFF = 0;
-            turnCANPIDConstants.kP = 1;
+            turnCANPIDConstants.kP = 1.2;
             //turnCANPIDConstants.kI = 0.0003;
             //turnCANPIDConstants.kD = 0.0005;
-            turnCANPIDConstants.kI = 0.0;
-            turnCANPIDConstants.kD = 0.0;
-            turnCANPIDConstants.kIZone = 0; //5 degrees
+            turnCANPIDConstants.kI = 0.001;
+            turnCANPIDConstants.kD = 5;
+            turnCANPIDConstants.kIZone = 0.18; //5 degrees
 
             encoderConstants = new CANDEncoderConstants();
             encoderConstants.kWheelDiameterMeters = 0.1016; // 4in wheels
@@ -144,6 +147,8 @@ public final class Config {
     public static final double kWheelBase = 0.7;
     public static final boolean kGyroReversed = false;
 
+    public static final String odometryNTTable = "Swerve Chassis/Odometry";
+
     public static ModuleConstants[] moduleConstants;
 
     // These are example values only - DO NOT USE THESE FOR YOUR OWN ROBOT!
@@ -154,9 +159,6 @@ public final class Config {
     // obtaining these
     // values for your robot.
     public static final class AutoConstants {
-        public static final double ksVolts = 1;
-        public static final double kvVoltSecondsPerMeter = 0.8;
-        public static final double kaVoltSecondsSquaredPerMeter = 0.15;
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
