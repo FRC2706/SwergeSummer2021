@@ -42,7 +42,6 @@ public class Robot extends TimedRobot {
 
         new SetModuleEncoderFromLamprey().schedule();
 
-
     }
 
     /**
