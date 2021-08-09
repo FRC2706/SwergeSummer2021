@@ -9,6 +9,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,6 +43,7 @@ public class SwerveModule {
     private NetworkTableEntry currentAngleEntry;
     private NetworkTableEntry speedError;
     private NetworkTableEntry angleError;
+    private NetworkTableEntry lampreyAngle;
 
     /**
      * Constructs a SwerveModule.
@@ -81,6 +83,9 @@ public class SwerveModule {
         m_turningMotor.restoreFactoryDefaults();
         m_turningMotor.setInverted(Config.module(moduleIndex).driveConstants.kTurningMotorInverted);
 
+        m_turningMotor.setIdleMode(IdleMode.kCoast);
+        m_driveMotor.setIdleMode(IdleMode.kCoast);
+        
         m_turningPIDController = m_turningMotor.getPIDController();
         m_turningPIDController.setOutputRange( Config.module(moduleIndex).turnCANPIDConstants.minPower, 
                                              Config.module(moduleIndex).turnCANPIDConstants.maxPower);
@@ -115,6 +120,8 @@ public class SwerveModule {
         currentAngleEntry = swerveModuleTable.getEntry("Current angle (radians)");
         speedError = swerveModuleTable.getEntry("speed Error");
         angleError = swerveModuleTable.getEntry("angle Error");
+        lampreyAngle = swerveModuleTable.getEntry("Lamprey Angle");
+
 
     }
 
@@ -187,6 +194,13 @@ public class SwerveModule {
         speedError.setDouble(desiredSpeed - currentSpeed);
         angleError.setDouble(ContinousPIDSparkMax.shortestError(new Rotation2d(desiredAngle), currentAngle).getRadians());
 
+    }
+
+    public void updateLamprey()
+    {
+        double offset = Config.module(m_moduleIndex).driveConstants.kLampreyOffset.get();
+        double lampreyRadians = m_lamprey.get();
+        lampreyAngle.setDouble(offset+lampreyRadians);
     }
 
     public void updateTurningEncoderFromLamprey() {
