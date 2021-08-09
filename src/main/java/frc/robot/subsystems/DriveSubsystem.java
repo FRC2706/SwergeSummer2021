@@ -4,8 +4,13 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.PigeonIMU;
+
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -34,13 +39,17 @@ public class DriveSubsystem extends SubsystemBase {
     private final Gyro m_gyro = new ADXRS450_Gyro();
 
     // Odometry class for tracking robot pose
-    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Config.kDriveKinematics, m_gyro.getRotation2d());
+    SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(Config.kDriveKinematics, pigeonRotation());
 
     // Singleton instance of the DriveSubsytem class
     private static DriveSubsystem instance;
+    private PigeonIMU m_pigeon;
+    private PigeonIMU.FusionStatus fusionStatus = new PigeonIMU.FusionStatus();
+    private NetworkTableEntry xOdometry, yOdometry, rotOdometry;
 
     /** Creates a new DriveSubsystem. */
     private DriveSubsystem() {
+        m_pigeon = new PigeonIMU(Config.OIConstants.PIGEON_ID);
     }
 
     public static DriveSubsystem getInstance() {
@@ -53,8 +62,17 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // Update the odometry in the periodic block
-        m_odometry.update(m_gyro.getRotation2d(), m_frontLeft.getState(), m_rearLeft.getState(),
+        Pose2d newPose = m_odometry.update(pigeonRotation(), m_frontLeft.getState(), m_rearLeft.getState(),
                 m_rearRight.getState(), m_frontRight.getState());
+
+        var table = NetworkTableInstance.getDefault().getTable("DrivetrainOdometry");
+        xOdometry = table.getEntry("xOdometry");
+        yOdometry = table.getEntry("yOdometry");
+        rotOdometry = table.getEntry("rotOdometry");
+
+        xOdometry.setDouble(newPose.getX());
+        yOdometry.setDouble(newPose.getY());
+        rotOdometry.setDouble(newPose.getRotation().getDegrees());
     }
 
     /**
@@ -72,7 +90,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @param pose The pose to which to set the odometry.
      */
     public void resetOdometry(Pose2d pose) {
-        m_odometry.resetPosition(pose, m_gyro.getRotation2d());
+        m_odometry.resetPosition(pose, pigeonRotation());
     }
 
     /**
@@ -87,7 +105,7 @@ public class DriveSubsystem extends SubsystemBase {
     @SuppressWarnings("ParameterName")
     public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
         var swerveModuleStates = Config.kDriveKinematics.toSwerveModuleStates(
-                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+                fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, pigeonRotation())
                         : new ChassisSpeeds(xSpeed, ySpeed, rot));
         SwerveDriveKinematics.normalizeWheelSpeeds(swerveModuleStates, Config.AutoConstants.kMaxSpeedMetersPerSecond);
         m_frontLeft.setDesiredState(swerveModuleStates[0]);
@@ -125,8 +143,39 @@ public class DriveSubsystem extends SubsystemBase {
         m_frontRight.stopMotors();
     }
     /** Zeroes the heading of the robot. */
-    public void zeroHeading() {
-        m_gyro.reset();
+    public void setHeading(double heading) {
+        m_pigeon.setFusedHeading(heading);
+    }
+
+        /**
+     * Returns true if the pigeon has been defined
+     * @return True if the pigeon is defined, false otherwise
+     */
+    public final boolean hasPigeon() {
+        return m_pigeon != null;
+    }
+    
+    /**
+     * A getter for the pigeon
+     * @return The pigeon
+     */
+    public final PigeonIMU getPigeon() {
+        return m_pigeon;
+    }
+
+    public Rotation2d pigeonRotation()
+    {
+        return Rotation2d.fromDegrees(getCurrentAngle());
+    }
+    
+    /**
+     * Tries to get the current angle as reported by the pigeon
+     * @return The current heading (In degrees) or 0 if there is no pigeon.
+     */
+    private final double getCurrentAngle() {
+        if (!hasPigeon()) return 0d;
+        m_pigeon.getFusedHeading(fusionStatus);
+        return fusionStatus.heading;
     }
 
     /**
@@ -135,15 +184,7 @@ public class DriveSubsystem extends SubsystemBase {
      * @return the robot's heading in degrees, from -180 to 180
      */
     public double getHeading() {
-        return m_gyro.getRotation2d().getDegrees();
+        return pigeonRotation().getDegrees();
     }
 
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    public double getTurnRate() {
-        return m_gyro.getRate() * (Config.kGyroReversed ? -1.0 : 1.0);
-    }
 }
