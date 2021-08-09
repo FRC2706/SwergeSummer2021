@@ -132,7 +132,7 @@ public class SwerveModule {
     {
         //m_driveEncoder.getVelocity();  //--> unit RPM --> m/s
         return (m_driveEncoder.getVelocity()
-                * (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI)
+                * (Config.module(m_moduleIndex).encoderConstants.kWheelDiameterMeters * Math.PI)
                 / Config.CANDEncoderConstants.SECOND_PER_MINUTE);
     }
 
@@ -146,7 +146,7 @@ public class SwerveModule {
     {
         return (speedMetersPerSecond
                 * Config.CANDEncoderConstants.SECOND_PER_MINUTE
-                / (Config.moduleConstants[m_moduleIndex].encoderConstants.kWheelDiameterMeters * Math.PI) );
+                / (Config.module(m_moduleIndex).encoderConstants.kWheelDiameterMeters * Math.PI) );
     }
 
     public double convertAngleToPos( double angleRadius )

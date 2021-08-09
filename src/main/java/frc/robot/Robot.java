@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.SetModuleEncoderFromLamprey;
 import frc.robot.config.Config;
+import frc.robot.subsystems.DriveSubsystemSM;
 
 /**
  * The VM is configured to automatically run this class, and to call the
@@ -22,6 +23,8 @@ public class Robot extends TimedRobot {
 
     private RobotContainer m_robotContainer;
 
+    private Config config;
+
     /**
      * This function is run when the robot is first started up and should be used
      * for any initialization code.
@@ -31,10 +34,14 @@ public class Robot extends TimedRobot {
         // Instantiate our RobotContainer. This will perform all our button bindings,
         // and put our
         // autonomous chooser on the dashboard.
-        new Config();  
+        config = new Config();
+        
+        DriveSubsystemSM.getInstance();
+
         m_robotContainer = new RobotContainer();
 
         new SetModuleEncoderFromLamprey().schedule();
+
 
     }
 
