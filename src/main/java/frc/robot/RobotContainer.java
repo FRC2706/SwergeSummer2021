@@ -25,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import java.util.List;
+
+import frc.robot.commands.ModuleAngleFromJoystick;
 import frc.robot.commands.SingleModuleOnce;
 
 /*
@@ -73,6 +75,9 @@ public class RobotContainer {
 
         Command singleModuleOnce1 = new SingleModuleOnce(1.0, Rotation2d.fromDegrees(315));
         new JoystickButton(driverStick, XboxController.Button.kBumperRight.value).whenHeld(singleModuleOnce1);
+
+        Command moduleAngleFromJoystick = new ModuleAngleFromJoystick(() -> driverStick.getRawAxis(0), () -> driverStick.getRawAxis(1));
+        new JoystickButton(driverStick, XboxController.Button.kStart.value).whenHeld(moduleAngleFromJoystick);
     }
 
     /**
