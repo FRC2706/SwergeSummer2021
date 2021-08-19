@@ -21,6 +21,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
+import com.revrobotics.CANSparkMax.IdleMode;
 public class SwerveModule {
 
     private int m_moduleIndex;
@@ -62,6 +63,7 @@ public class SwerveModule {
         // Factory Default to prevent unexpected behaviour
         m_driveMotor.restoreFactoryDefaults();
         m_driveMotor.setInverted(Config.module(moduleIndex).driveConstants.kDriveMotorInverted);
+        m_driveMotor.setIdleMode(IdleMode.kCoast);
 
         m_drivePIDController = m_driveMotor.getPIDController();
         m_drivePIDController.setOutputRange( Config.module(moduleIndex).driveCANPIDConstants.minPower, 
@@ -80,6 +82,8 @@ public class SwerveModule {
                                          MotorType.kBrushless);
         m_turningMotor.restoreFactoryDefaults();
         m_turningMotor.setInverted(Config.module(moduleIndex).driveConstants.kTurningMotorInverted);
+        m_turningMotor.setIdleMode(IdleMode.kCoast);
+
 
         m_turningPIDController = m_turningMotor.getPIDController();
         m_turningPIDController.setOutputRange( Config.module(moduleIndex).turnCANPIDConstants.minPower, 
