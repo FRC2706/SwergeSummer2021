@@ -40,7 +40,7 @@ public class ModuleAngleFromJoystick extends CommandBase {
         } else {
             Rotation2d angle = new Rotation2d(x, y);
 
-            SwerveModuleState state = new SwerveModuleState(0, angle);
+            SwerveModuleState state = new SwerveModuleState(0.5, angle);
 
             DriveSubsystemSM.getInstance().setModuleState(state);
         }
