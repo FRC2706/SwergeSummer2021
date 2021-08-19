@@ -97,20 +97,20 @@ public final class Config {
             //driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
             //driveCANPIDConstants.kD = 0.0002;
             driveCANPIDConstants.kIZone = 0;
-            driveCANPIDConstants.kFF = 0.00015; // These can also be module specific.
-            driveCANPIDConstants.kP = 0.00015; // Hopefully they won't need to be.
+            driveCANPIDConstants.kFF = 0.0013; // These can also be module specific.
+            driveCANPIDConstants.kP = 0.000077; // Hopefully they won't need to be.
             driveCANPIDConstants.kI = 0.; // Depends on hardware differences.
-            driveCANPIDConstants.kD = 0.02;
+            driveCANPIDConstants.kD = 0;
 
             turnCANPIDConstants = new CANPIDConstants();
             turnCANPIDConstants.minPower = -1;
             turnCANPIDConstants.maxPower = 1;
             turnCANPIDConstants.kFF = 0;
-            turnCANPIDConstants.kP = 1;
+            turnCANPIDConstants.kP = 9;
             //turnCANPIDConstants.kI = 0.0003;
             //turnCANPIDConstants.kD = 0.0005;
             turnCANPIDConstants.kI = 0.0;
-            turnCANPIDConstants.kD = 0.0;
+            turnCANPIDConstants.kD = 40;
             turnCANPIDConstants.kIZone = 0; //5 degrees
 
             encoderConstants = new CANDEncoderConstants();
