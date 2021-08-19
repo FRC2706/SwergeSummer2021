@@ -70,11 +70,18 @@ public class RobotContainer {
         */ 
 
         // Instantiate the command and bind it
-        Command singleModuleOnce0 = new SingleModuleOnce(0, Rotation2d.fromDegrees(0));
+        Command singleModuleOnce0 = new SingleModuleOnce(0, Rotation2d.fromDegrees(90));
         new JoystickButton(driverStick, XboxController.Button.kBumperLeft.value).whenHeld(singleModuleOnce0);
 
-        Command singleModuleOnce1 = new SingleModuleOnce(0, Rotation2d.fromDegrees(90));
+        Command singleModuleOnce1 = new SingleModuleOnce(0, Rotation2d.fromDegrees(0));
         new JoystickButton(driverStick, XboxController.Button.kBumperRight.value).whenHeld(singleModuleOnce1);
+
+        Command singleModuleOnce2 = new SingleModuleOnce(0.5, Rotation2d.fromDegrees(0));
+        new JoystickButton(driverStick, XboxController.Button.kY.value).whenHeld(singleModuleOnce2);
+
+        Command singleModuleOnce3 = new SingleModuleOnce(-0.5, Rotation2d.fromDegrees(0));
+        new JoystickButton(driverStick, XboxController.Button.kX.value).whenHeld(singleModuleOnce3);
+
 
         Command moduleAngleFromJoystick = new ModuleAngleFromJoystick(() -> driverStick.getRawAxis(0), () -> driverStick.getRawAxis(1));
         new JoystickButton(driverStick, XboxController.Button.kStart.value).whenHeld(moduleAngleFromJoystick);
