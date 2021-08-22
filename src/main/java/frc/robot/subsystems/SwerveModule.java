@@ -43,6 +43,7 @@ public class SwerveModule {
     private NetworkTableEntry currentAngleEntry;
     private NetworkTableEntry speedError;
     private NetworkTableEntry angleError;
+    private NetworkTableEntry lampreyAngle;
 
     /**
      * Constructs a SwerveModule.
@@ -119,6 +120,7 @@ public class SwerveModule {
         currentAngleEntry = swerveModuleTable.getEntry("Current angle (radians)");
         speedError = swerveModuleTable.getEntry("speed Error");
         angleError = swerveModuleTable.getEntry("angle Error");
+        lampreyAngle = swerveModuleTable.getEntry("Lamprey Angle (radians)");
 
     }
 
@@ -187,14 +189,14 @@ public class SwerveModule {
         currentAngleEntry.setDouble(getModuleCurrentAngle().getRadians());
         speedError.setDouble(desiredSpeed - getModuleCurrentSpeedMetersPerSecond());
         angleError.setDouble(desiredAngle - getModuleCurrentAngle().getRadians());
-
+        lampreyAngle.setDouble(m_lamprey.get());
     }
 
     public void updateTurningEncoderFromLamprey() {
         // Get offset value from networktables
         double offset = Config.module(m_moduleIndex).driveConstants.kLampreyOffset.get();
         double lampreyRadians = m_lamprey.get();
-    
+        
         // Give the value from Lamprey to the SparkMax
         m_turningEncoder.setPosition(convertAngleToPos(lampreyRadians + offset));
     }
